@@ -1,62 +1,39 @@
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fleerob%2Fleerob.io)
 
-# Vercel + Planetscale
-A [next.js](https://nextjs.org/) app deployed to [vercel](https://vercel.com) with a [planetscale](https://planetscale.com) integration. This example app uses the [planetscale-node](https://github.com/planetscale/planetscale-node) client to query the database
+# leerob.io
 
-## Setup database
-- Install [Planetscale CLI](https://planetscale.com/cli)
-- Authenticate the CLI
-```sh
-pscale auth login
-```
-- Create a new database (_skip this step if you already have a database_)
-```sh
-pscale database create <database>
-```
-- Create a `development` branch
-```sh
-pscale branch create <database> <branch>
-```
-- Connect to your branch
-```sh
-pscale shell <database> <branch>
-```
-- Insert example tables
-```sql
-CREATE TABLE users (
-  id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  email varchar(255) NOT NULL,
-  password varchar(255) NOT NULL,
-  name varchar(255)
-);
-```
-- Create a **deploy request** 
+- **Framework**: [Next.js](https://nextjs.org/)
+- **Database**: [PlanetScale](https://planetscale.com)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org)
+- **Deployment**: [Vercel](https://vercel.com)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com)
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
+
+## TODO
+
+In early 2023, I refactored my site to use the new `app/` directory in Next.js 13. I went ahead and shipped it, but there are still a few things I want to do:
+
+- [ ] Global `404` page coming soon
+- [ ] Move redirects to end of routing stack (not in `next.config.js`)
+- [ ] Use new support for API routes in `app` (not ready yet)
+- [ ] Improved scroll position support in `app/` (not implemented yet)
+
+You can learn more about the `app/` directory [here](https://nextjs.org/docs/app).
+
+## Running Locally
+
+This application requires Node.js v16.13+.
+
 ```bash
-pscale deploy-request create <database> <branch>
-```
-- _Deploy_ the **deploy request** 
-```bash
-pscale deploy-request deploy <database> <deploy-request-number>
-```
-- To find your `<deploy-request-number>`, simply run:
-```bash
-pscale deploy-request list <database>
-```
-- Merge your `development` branch into `main`
-```bash
-pscale deploy-request deploy <database> <deploy-request-number>
+git clone https://github.com/leerob/leerob.io.git
+cd leerob.io
+pnpm install
+pnpm run setup # Remove all of my personal information
+pnpm dev
 ```
 
-## Clone & Deploy to vercel
-<a href="https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fvercel-integration-example&project-name=vercel-integration-example&repository-name=vercel-integration-example&integration-ids=oac_ni8CGiTU3oM25q1k2L6unVMp">
-  <img src="https://vercel.com/button" alt="Deploy with Vercel"/>
-</a>
+Create a `.env` file similar to [`.env.example`](https://github.com/leerob/leerob.io/blob/main/.env.example).
 
+## Cloning / Forking
 
-- The integration will automatically add the following environment variables to your Vercel project(s)
-  - `PLANETSCALE_DB`
-  - `PLANETSCALE_ORG`
-  - `PLANETSCALE_TOKEN`
-  - `PLANETSCALE_TOKEN_NAME`
-
-_These environment variables are used by [planetscale-node](https://github.com/planetscale/planetscale-node) client to connect to your database_
-- Re-deploy your application after the installation is complete and you will have a working app.
+Please review the [license](https://github.com/leerob/leerob.io/blob/main/LICENSE.txt) and remove all of my personal information (resume, blog posts, images, etc.) by running `pnpm run setup`.
