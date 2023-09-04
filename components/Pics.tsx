@@ -1,20 +1,21 @@
-"use client";
-import { cx } from "lib/utils";
-import Image from "next/image";
-import { useState } from "react";
+"use client"
 
-export default function CoverImage(props) {
-  const [isLoading, setLoading] = useState(true);
+import { cx } from "lib/utils"
+import Image from "next/image"
+import { useState } from "react"
+
+export default function CoverImage(props: any) {
+  const [isLoading, setLoading] = useState(true)
 
   return (
-    <div className="max-w-3xl  mb-6 content-center overflow-hidden justify-center md:rounded-lg   ">
+    <div className="mb-6  max-w-3xl content-center justify-center overflow-hidden md:rounded-lg   ">
       <Image
         alt={""}
         className={cx(
-          " flex object-cover object-top justify-center items-center w-full  lg:max-w-7xl mx-auto duration-700 ease-in-out group-hover:opacity-75",
+          " mx-auto flex w-full items-center justify-center object-cover  object-top duration-700 ease-in-out group-hover:opacity-75 lg:max-w-7xl",
           isLoading
             ? "scale-110 blur-2xl grayscale"
-            : "scale-100 blur-0 grayscale-0",
+            : "scale-100 blur-0 grayscale-0"
         )}
         onLoadingComplete={() => setLoading(false)}
         placeholder="blur"
@@ -28,5 +29,5 @@ export default function CoverImage(props) {
         )}
       </figcaption> */}
     </div>
-  );
+  )
 }

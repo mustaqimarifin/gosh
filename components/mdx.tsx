@@ -1,69 +1,77 @@
-/* eslint-disable @next/next/no-img-element */
-import * as React from 'react';
-import Link from 'next/link';
-import Image from 'next/legacy/image';
-import { useMDXComponent } from 'next-contentlayer/hooks';
-//import pMemoize from 'p-memoize';
+//@ts-nocheck
+import Image from "next/legacy/image"
+import Link from "next/link"
+import { useMDXComponent } from "next-contentlayer/hooks"
+import * as React from "react"
+import { Tweet } from "react-tweet"
+
+//import Tweet from './tweet'
 //import { allPosts } from 'contentlayer/generated';
 
 const CustomLink = (props) => {
-  const href = props.href;
+  const href = props.href
 
-  if (href.startsWith('/')) {
+  if (href.startsWith("/")) {
     return (
       <Link href={href} {...props}>
         {props.children}
       </Link>
-    );
+    )
   }
 
-  if (href.startsWith('#')) {
-    return <a {...props} />;
+  if (href.startsWith("#")) {
+    return <a {...props} />
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />;
-};
-
-const Paragraph = (props) => {
-  if (typeof props.children !== 'string') {
-    return <>{props.children}</>;
-  }
-  if (props.children.type === 'img') {
-    return <RoundedImage {...props}>{props.children}</RoundedImage>;
-  }
-  return <p {...props} />;
-};
-
-function RoundedImage(props) {
-  return (
-    <Image alt={''} className="rounded-lg" placeholder="blur" {...props} />
-  );
+  return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
+const Paragraph = (props) => {
+  if (typeof props.children !== "string") {
+    return <>{props.children}</>
+  }
+  if (props.children.type === "img") {
+    return <RoundedImage {...props}>{props.children}</RoundedImage>
+  }
+  return <p {...props} />
+}
+
+function RoundedImage(props) {
+  return <Image alt={""} className="rounded-lg" placeholder="blur" {...props} />
+}
+
+const MeatTweet = ({ id }) => {
+  return (
+    <div className="my-6 flex w-full content-center p-6">
+      <Tweet id={id} />
+    </div>
+  )
+}
 function Callout(props) {
   return (
-    <div className="flex bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 my-8">
-      <div className="flex items-center w-4 mr-4">{props.emoji}</div>
-      <div className="w-full callout">{props.children}</div>
+    <div className="my-8 flex rounded-lg border border-neutral-200 bg-neutral-100 p-4 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mr-4 flex w-4 items-center">{props.emoji}</div>
+      <div className="callout w-full">{props.children}</div>
     </div>
-  );
+  )
 }
 
 function ProsCard({ title, pros }) {
   return (
-    <div className="border border-emerald-200 dark:border-emerald-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-4 w-full">
+    <div className="my-4 w-full rounded-xl border border-emerald-200 bg-neutral-50 p-6 dark:border-emerald-900 dark:bg-neutral-900">
       <span>{`You might use ${title} if...`}</span>
       <div className="mt-4">
         {pros.map((pro) => (
-          <div key={pro} className="flex font-medium items-baseline mb-2">
-            <div className="h-4 w-4 mr-2">
+          <div key={pro} className="mb-2 flex items-baseline font-medium">
+            <div className="mr-2 h-4 w-4">
               <svg className="h-4 w-4 text-emerald-500" viewBox="0 0 24 24">
                 <g
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round">
+                  strokeLinejoin="round"
+                >
                   <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                   <path d="M22 4L12 14.01l-3-3" />
                 </g>
@@ -74,22 +82,23 @@ function ProsCard({ title, pros }) {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 function ConsCard({ title, cons }) {
   return (
-    <div className="border border-red-200 dark:border-red-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-6 w-full">
+    <div className="my-6 w-full rounded-xl border border-red-200 bg-neutral-50 p-6 dark:border-red-900 dark:bg-neutral-900">
       <span>{`You might not use ${title} if...`}</span>
       <div className="mt-4">
         {cons.map((con) => (
-          <div key={con} className="flex font-medium items-baseline mb-2">
-            <div className="h-4 w-4 mr-2">
+          <div key={con} className="mb-2 flex items-baseline font-medium">
+            <div className="mr-2 h-4 w-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                className="h-4 w-4 text-red-500">
+                className="h-4 w-4 text-red-500"
+              >
                 <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
               </svg>
             </div>
@@ -98,7 +107,7 @@ function ConsCard({ title, cons }) {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 const Components = {
@@ -108,20 +117,21 @@ const Components = {
   Callout,
   ProsCard,
   ConsCard,
-};
+  MeatTweet,
+}
 
 //const PC = React.cache(Components)
 
 interface MdxProps {
-  code: string;
-  components?: Record<string, any>;
-  meta?: string[];
-  tweets?: Record<string, any>;
-  [key: string]: unknown;
+  code: string
+  components?: Record<string, any>
+  meta?: string[]
+  tweets?: Record<string, any>
+  [key: string]: unknown
 }
 
 export const MDX = ({ code }: MdxProps) => {
-  const Component = useMDXComponent(code);
+  const Component = useMDXComponent(code)
 
-  return <Component components={{ ...Components }} />;
-};
+  return <Component components={{ ...Components }} />
+}

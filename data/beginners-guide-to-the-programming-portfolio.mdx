@@ -1,0 +1,101 @@
+---
+title: "Programming Portfolios"
+date: "2017-02-24"
+summary: "Tips for creating a portfolio that stands out."
+---
+
+# Demo
+
+```
+hello
+```
+
+```foo.
+hello
+```
+
+```whatever
+hello
+```
+
+# Hello
+
+```web/shine.js
+let hello = "hello brightness"
+console.log(hello, "my old friend")
+```
+
+```app/page.jsx
+import { Code } from "bright"
+
+Code.extensions = {
+  mark: {
+    InlineAnnotation: ({ children, query }) => (
+      <mark style={{ background: query }}>{children}</mark>
+    ),
+    MultilineAnnotation: ({ children, query }) => (
+      <mark style={{ background: query }}>{children}</mark>
+    ),
+  },
+  number: ({ children, content }) => (
+    <input defaultValue={content} type="number" min={0} max={99} />
+  ),
+  title: {
+    beforeHighlight: (props, query) => ({
+      ...props,
+      title: query,
+    }),
+  },
+}
+
+const myCode = `
+// mark[3:10] red
+console.log(1)
+// mark
+const x = 20
+`
+
+export default function Page() {
+  return <Code lang="js">{myCode}</Code>
+}
+```
+
+````md
+```js
+/// mark[3:10] red
+console.log(1)
+/// number[11:12]
+const x = 20
+```
+````
+
+## Result
+
+```js
+// title foo.js
+console.log(1) // mark[3:10] red
+// mark
+const x = 20
+```
+
+## Mark code with space
+
+````md
+```
+
+
+  here is some text with leading and trailing spaces
+  that is working if the two lines are left-aligned.
+
+
+```
+````
+
+```
+
+
+  here is some text with leading and trailing spaces
+  that is working if the two lines are left-aligned.
+
+
+```

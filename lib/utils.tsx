@@ -1,44 +1,44 @@
 //@ts-nocheck
-import { ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue,clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cx(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 /* eslint-disable no-control-regex */
 export const autosize = (target: HTMLTextAreaElement): void => {
-  target.style.height = "initial";
-  target.style.height = +target.scrollHeight + "px";
-};
+  target.style.height = "initial"
+  target.style.height = +target.scrollHeight + "px"
+}
 
 export const countLines = (el: HTMLElement): number => {
-  if (!el) return -1;
+  if (!el) return -1
   // Get total height of the content
-  const divHeight = el.offsetHeight;
+  const divHeight = el.offsetHeight
 
   // object.style.lineHeight, returns
   // the lineHeight property
   // height of one line
   const lineHeight = parseInt(
-    window.getComputedStyle(el).getPropertyValue("line-height"),
-  );
+    window.getComputedStyle(el).getPropertyValue("line-height")
+  )
 
-  const lines = divHeight / lineHeight;
-  return lines;
-};
+  const lines = divHeight / lineHeight
+  return lines
+}
 
-export const PAGE_SIZE = 10;
-export const SCROLL_OFFSET_PX = 400;
-export const MAX_DEPTH = 10;
+export const PAGE_SIZE = 10
+export const SCROLL_OFFSET_PX = 400
+export const MAX_DEPTH = 10
 
-export const validateEmail = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
+export const validateEmail = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g
 
 export const isEmail = (email: string) => {
   return /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/.test(
-    email,
-  );
-};
+    email
+  )
+}
 
 export const User = (props) => {
   return (
@@ -54,5 +54,95 @@ export const User = (props) => {
         clipRule="evenodd"
       />
     </svg>
-  );
-};
+  )
+}
+
+export function formatDate(date: Date) {
+  const currentDate = new Date()
+  const targetDate = new Date(date)
+
+  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear()
+  const monthsAgo = currentDate.getMonth() - targetDate.getMonth()
+  const daysAgo = currentDate.getDate() - targetDate.getDate()
+
+  let formattedDate = ""
+
+  if (yearsAgo > 0) {
+    formattedDate = `${yearsAgo}y ago`
+  } else if (monthsAgo > 0) {
+    formattedDate = `${monthsAgo}mo ago`
+  } else if (daysAgo > 0) {
+    formattedDate = `${daysAgo}d ago`
+  } else {
+    formattedDate = "Today"
+  }
+
+  const fullDate = targetDate.toLocaleString("en-us", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+
+  return `${fullDate} (${formattedDate})`
+}
+
+export function resizeTextArea(textarea: HTMLTextAreaElement | null) {
+  const maxHeight = 270
+  textarea.style.height = `0px`
+  const height =
+    textarea.scrollHeight <= maxHeight ? textarea.scrollHeight : maxHeight
+  textarea.style.height = `${height}px`
+}
+
+export function toggleEmail(event: ReactMouseEvent<HTMLElement, MouseEvent>) {
+  const element = event.target as HTMLElement
+  const toggle = element.closest<HTMLAnchorElement>(".email-hidden-toggle a")
+  if (toggle && event.currentTarget.contains(toggle)) {
+    event.preventDefault()
+    const container = element.closest("div")
+    const content = container.querySelector(".email-hidden-reply")
+    content.classList.toggle("expanded")
+  }
+}
+
+export function handleClipboardCopy(
+  event: ReactMouseEvent<HTMLElement, MouseEvent>
+) {
+  const element = event.target as HTMLElement
+  const container = element.closest<HTMLDivElement>(
+    ".snippet-clipboard-content, .highlight"
+  )
+  const button = element.closest<HTMLButtonElement>("button.ClipboardButton")
+
+  if (container && button && event.currentTarget.contains(button)) {
+    event.preventDefault()
+    const contents =
+      container.dataset.snippetClipboardCopyContent ||
+      container.querySelector("pre").textContent ||
+      ""
+
+    clipboardCopy(contents).then(() => {
+      const clipboardIcon = button.querySelector<SVGElement>(
+        "svg.js-clipboard-copy-icon"
+      )
+      const checkIcon = button.querySelector<SVGElement>(
+        "svg.js-clipboard-check-icon"
+      )
+
+      clipboardIcon.classList.add("d-none")
+      checkIcon.classList.remove("d-none")
+
+      setTimeout(() => {
+        clipboardIcon.classList.remove("d-none")
+        checkIcon.classList.add("d-none")
+      }, 2000)
+    })
+  }
+}
+
+export function handleCommentClick(
+  event: ReactMouseEvent<HTMLElement, MouseEvent>
+) {
+  toggleEmail(event)
+  handleClipboardCopy(event)
+}

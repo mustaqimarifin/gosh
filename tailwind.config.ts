@@ -1,5 +1,5 @@
-import typo from "@tailwindcss/typography";
-import type { Config } from "tailwindcss";
+import typo from "@tailwindcss/typography"
+import type { Config } from "tailwindcss"
 
 const config = {
   content: [
@@ -26,6 +26,6 @@ const config = {
     hoverOnlyWhenSupported: true,
   },
   plugins: [typo],
-} satisfies Config;
+} satisfies Config
 
-export default config;
+export default config

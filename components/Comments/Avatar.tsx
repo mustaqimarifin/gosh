@@ -1,13 +1,13 @@
-import { cx } from "lib/utils";
-import Image from "next/image";
-import React, { type FC } from "react";
+import { cx } from "lib/utils"
+import Image from "next/image"
+import React, { type FC } from "react"
 
 export interface AvatarProps
   extends Omit<React.HTMLProps<HTMLDivElement>, "size"> {
-  src: string;
-  size?: "sm" | "lg";
-  isLoading?: boolean;
-  error?: any;
+  src: string
+  size?: "sm" | "lg"
+  isLoading?: boolean
+  error?: any
 }
 
 const Avatar: FC<AvatarProps> = ({
@@ -27,7 +27,7 @@ const Avatar: FC<AvatarProps> = ({
       className={cx(
         size === "sm" ? "h-6 w-6" : "h-10 w-10",
         "bg-alpha-10 relative inline-block overflow-hidden rounded-full",
-        className,
+        className
       )}
     >
       {src && (
@@ -61,7 +61,7 @@ const Avatar: FC<AvatarProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Avatar;
+export default Avatar

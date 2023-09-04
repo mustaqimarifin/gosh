@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { cx } from "lib/utils";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { LayoutGroup, motion } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion"
+import { cx } from "lib/utils"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 const navItems = {
   "/": {
@@ -18,16 +18,16 @@ const navItems = {
   "/scribbles": {
     name: "scribbles",
   },
-  "/guestbook": {
+  "/hotline": {
     name: "guestbook",
   },
-};
+}
 
 function Logo() {
   return (
     <Link aria-label="Lee Robinson" href="/">
       <motion.svg
-        className="text-black dark:text-white h-[25px] md:h-[37px]"
+        className="h-[25px] text-black dark:text-white md:h-[37px]"
         width="25"
         height="37"
         viewBox="0 0 232 316"
@@ -65,46 +65,46 @@ function Logo() {
         />
       </motion.svg>
     </Link>
-  );
+  )
 }
 
 export default function Navbar() {
-  let pathname = usePathname() || "/";
+  let pathname = usePathname() || "/"
   if (pathname.includes("/post/")) {
-    pathname = "/post";
+    pathname = "/post"
   }
 
   return (
-    <aside className="md:w-[150px] md:flex-shrink-0 -mx-4 md:mx-0 md:px-0 font-serif">
+    <aside className="-mx-4 font-serif md:mx-0 md:w-[150px] md:flex-shrink-0 md:px-0">
       <div className="lg:sticky lg:top-20">
-        <div className="ml-2 md:ml-[12px] mb-2 px-4 md:px-0 md:mb-8 space-y-10 flex flex-col md:flex-row items-start ">
+        <div className="mb-2 ml-2 flex flex-col items-start space-y-10 px-4 md:mb-8 md:ml-[12px] md:flex-row md:px-0 ">
           <Logo />
         </div>
         <LayoutGroup>
           <nav
-            className="flex flex-row md:flex-col items-start relative px-4 md:px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
+            className="fade relative flex scroll-pr-6 flex-row items-start px-4 pb-0 md:relative md:flex-col md:overflow-auto md:px-0"
             id="nav"
           >
-            <div className="flex flex-row md:flex-col space-x-0 pr-10 mb-2 mt-2 md:mt-0">
+            <div className="mb-2 mt-2 flex flex-row space-x-0 pr-10 md:mt-0 md:flex-col">
               {Object.entries(navItems).map(([path, { name }]) => {
-                const isActive = path === pathname;
+                const isActive = path === pathname
                 return (
                   <Link
                     key={path}
                     href={path}
                     className={cx(
-                      "transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle",
+                      "flex align-middle transition-all hover:text-neutral-800 dark:hover:text-neutral-200",
                       {
                         "text-neutral-500": !isActive,
                         "font-bold": isActive,
-                      },
+                      }
                     )}
                   >
-                    <span className="relative py-[5px] px-[10px]">
+                    <span className="relative px-[10px] py-[5px]">
                       {name}
                       {path === pathname ? (
                         <motion.div
-                          className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-md z-[-1]"
+                          className="absolute inset-0 z-[-1] rounded-md bg-neutral-100 dark:bg-neutral-800"
                           layoutId="sidebar"
                           transition={{
                             type: "spring",
@@ -115,12 +115,12 @@ export default function Navbar() {
                       ) : null}
                     </span>
                   </Link>
-                );
+                )
               })}
             </div>
           </nav>
         </LayoutGroup>
       </div>
     </aside>
-  );
+  )
 }

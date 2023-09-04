@@ -1,19 +1,20 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { autosize, cx, User } from "lib/utils";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
-interface CommentFormProps {
-  autoFocus?: boolean;
-  buttonText?: string;
-  initialValue?: string;
+import { useAutoAnimate } from "@formkit/auto-animate/react"
+import { autosize, cx, User } from "lib/utils"
+import { signIn, signOut, useSession } from "next-auth/react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-  error?: string;
-  onSubmit: (text: string) => Promise<Comment | void>;
-  parentId?: Comment | null;
-  placeholder?: string;
-  submitLabel?: string;
-  handleResetCallback?: () => void;
-  hideEarlyCallback?: () => void;
+interface CommentFormProps {
+  autoFocus?: boolean
+  buttonText?: string
+  initialValue?: string
+
+  error?: string
+  onSubmit: (text: string) => Promise<void>
+  parentId?: string
+  placeholder?: string
+  submitLabel?: string
+  handleResetCallback?: () => void
+  hideEarlyCallback?: () => void
 }
 
 export const CommentForm = ({
@@ -23,47 +24,50 @@ export const CommentForm = ({
   handleResetCallback,
   error,
   initialValue = "",
-
+  parentId,
   onSubmit,
 }: CommentFormProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [text, setText] = useState(initialValue);
-  const { data: session } = useSession();
-  const [parent] = useAutoAnimate<HTMLDivElement>();
-  const textRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [text, setText] = useState(initialValue)
+  const { data: session } = useSession()
+  const [parent] = useAutoAnimate<HTMLDivElement>()
+  const textRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {
     if (autoFocus) {
       if (textRef && textRef.current) {
-        textRef.current.focus();
+        textRef.current.focus()
       }
     }
-  }, [autoFocus]);
+  }, [autoFocus])
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>): void {
-    setText(e.target.value);
+    setText(e.target.value)
     if (textRef?.current) {
-      autosize(textRef.current);
+      autosize(textRef.current)
     }
   }
 
   function handleReset(): void {
-    setText("");
+    setText("")
     if (textRef && textRef.current) {
-      textRef.current.style.height = "initial";
+      textRef.current.style.height = "initial"
     }
-    setIsLoading(false);
+    setIsLoading(false)
   }
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    onSubmit(text).then(() => {
-      setText("");
-      setIsLoading(true);
-      hideEarlyCallback?.();
-      handleReset();
-      handleResetCallback?.();
-    });
-  };
+  const handleSubmit = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault()
+      onSubmit(text).then(() => {
+        setText("")
+        setIsLoading(true)
+        hideEarlyCallback?.()
+        handleReset()
+        handleResetCallback?.()
+      })
+    },
+    [text]
+  )
 
   return (
     <>
@@ -99,7 +103,7 @@ export const CommentForm = ({
                   {
                     "cursor-not-allowed opacity-30":
                       text.length < 1 || isLoading,
-                  },
+                  }
                 )}
                 disabled={text.length < 1}
                 onClick={handleSubmit}
@@ -109,7 +113,7 @@ export const CommentForm = ({
               </button>
               <button
                 className={cx(
-                  "focus-ring h-full max-h-10 border border-transparent text-xs font-semibold text-pink-400 hover:text-yellow-500 dark:text-pink-200",
+                  "focus-ring h-full max-h-10 border border-transparent text-xs font-semibold text-pink-400 hover:text-yellow-500 dark:text-pink-200"
                 )}
                 aria-label="Sign Out"
                 onClick={() => signOut()}
@@ -133,8 +137,8 @@ export const CommentForm = ({
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 /* <form onSubmit={handleSubmit}>
    <div className="mt-4 flex flex-row">

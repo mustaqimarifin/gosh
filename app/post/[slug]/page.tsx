@@ -1,39 +1,37 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { Balancer } from 'react-wrap-balancer';
-import { PageViews } from 'components/PageViews';
-import { MDX } from 'components/mdx';
-import { allPosts } from 'contentlayer/generated';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+//import CommentComponent from "components/Comments"
+import ViewCounter from "app/view-counter"
+import { MDX } from "components/mdx"
+import { PageViews } from "components/PageViews"
+import { allPosts } from "contentlayer/generated"
+//import { PostCounter } from "lib/metrics"
+import type { Metadata } from "next"
+import lazy from "next/dynamic"
+import { notFound } from "next/navigation"
+import { Suspense } from "react"
+import { Balancer } from "react-wrap-balancer"
 
-const CommentComponent = dynamic(() => import('components/Comments'), {
-  ssr: false,
-});
+import { PostCounter } from "./PostCounter"
+
 export async function generateStaticParams() {
   return allPosts.map((post) => ({
     slug: post.slug,
-  }));
+  }))
 }
 
 export async function generateMetadata({
   params,
+}: {
+  params: { slug: string }
 }): Promise<Metadata | undefined> {
-  const post = allPosts.find((post) => post.slug === params.slug);
+  const post = allPosts.find((post) => post.slug === params.slug)
   if (!post) {
-    return;
+    return
   }
 
-  const {
-    title,
-    date: publishedTime,
-    summary: description,
-    image,
-    slug,
-  } = post;
+  const { title, date: publishedTime, summary: description, image, slug } = post
   const ogImage = image
     ? `https://leerob.io${image}`
-    : `https://leerob.io/api/og?title=${title}`;
+    : `https://leerob.io/api/og?title=${title}`
 
   return {
     title,
@@ -41,7 +39,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      type: 'article',
+      type: "article",
       publishedTime,
       url: `https://leerob.io/post/${slug}`,
       images: [
@@ -51,32 +49,36 @@ export async function generateMetadata({
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title,
       description,
       images: [ogImage],
     },
-  };
+  }
 }
 
-export default async function Blog({ params }) {
-  const post = allPosts.find((post) => post.slug === params.slug);
+export default async function Blog({ params }: { params: { slug: string } }) {
+  const post = allPosts.find((post) => post.slug === params.slug)
 
-  if (!post) notFound();
+  const CommentComponent = lazy(() => import("components/Comments"), {
+    ssr: false,
+  })
+  /*   const views = await apiRPC.post.addViewCount.mutate({ slug })
+  const total = views?.total?.count */
+
+  if (!post) notFound()
   return (
     <section>
-      <h1 className="font-bold text-3xl font-serif max-w-[650px]">
+      <h1 className="max-w-[650px] font-serif text-3xl font-bold">
         <Balancer>{post.title}</Balancer>
       </h1>
-      <div className="grid grid-cols-[auto_1fr_auto] items-center mt-4 mb-8 font-mono text-sm max-w-[650px]">
-        <div className="bg-neutral-100 dark:bg-neutral-800 rounded-md px-2 py-1 tracking-tighter">
+      <div className="mb-8 mt-4 grid max-w-[650px] grid-cols-[auto_1fr_auto] items-center font-mono text-sm">
+        <div className="rounded-md bg-neutral-100 px-2 py-1 tracking-tighter dark:bg-neutral-800">
           {post.date}
         </div>
-        <div className="h-[0.2em] bg-neutral-50 dark:bg-neutral-800 mx-2" />
         <PageViews slug={post.slug} trackView />
       </div>
-      {/*       <Modal /> */}
-      <article className="prose prose-quoteless prose-neutral dark:prose-invert">
+      <article className="prose prose-neutral prose-quoteless dark:prose-invert">
         <MDX code={post.body.code} />
 
         <Suspense fallback={<>Loading...</>}>
@@ -84,5 +86,5 @@ export default async function Blog({ params }) {
         </Suspense>
       </article>
     </section>
-  );
+  )
 }

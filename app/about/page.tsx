@@ -1,25 +1,21 @@
 /* eslint-disable react/no-unescaped-entities */
-import type { Metadata } from "next";
-import {
-  GitHubIcon,
-  YoutubeIcon,
-  ArrowIcon,
-  TwitterIcon,
-} from "components/icons";
+import { ArrowIcon, GitHubIcon } from "components/lolicon"
+import { TwitterIcon, YoutubeIcon } from "lucide-react"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About",
   description: "VP of Developer Experience at Vercel.",
-};
+}
 
 export default function AboutPage() {
   return (
     <section>
-      <h1 className="font-bold text-3xl font-serif">About Me</h1>
+      <h1 className="font-serif text-3xl font-bold">About Me</h1>
       <p className="my-5 text-neutral-800 dark:text-neutral-200">
         Hey, I'm Lee. Most folks know me as <b>leerob</b> online.
       </p>
-      <div className="prose prose-neutral dark:prose-invert text-neutral-800 dark:text-neutral-200">
+      <div className="prose prose-neutral text-neutral-800 dark:prose-invert dark:text-neutral-200">
         <p>
           I'm currently the <b>VP of Developer Experience at Vercel</b>, where I
           lead our Developer Relations and Documentation teams. I focus on{" "}
@@ -50,7 +46,7 @@ export default function AboutPage() {
             rel="noopener noreferrer"
             target="_blank"
             href="https://twitter.com/vmprmyth"
-            className="flex w-full border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 no-underline items-center text-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900 hover:bg-neutral-100 transition-all justify-between"
+            className="flex w-full items-center justify-between rounded-lg border border-neutral-200 p-4 text-neutral-800 no-underline transition-all hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900"
           >
             <div className="flex items-center">
               <TwitterIcon />
@@ -62,7 +58,7 @@ export default function AboutPage() {
             rel="noopener noreferrer"
             target="_blank"
             href="https://github.com/leerob"
-            className="flex w-full border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 no-underline items-center text-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900 hover:bg-neutral-100 transition-all justify-between"
+            className="flex w-full items-center justify-between rounded-lg border border-neutral-200 p-4 text-neutral-800 no-underline transition-all hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900"
           >
             <div className="flex items-center">
               <GitHubIcon />
@@ -74,7 +70,7 @@ export default function AboutPage() {
             rel="noopener noreferrer"
             target="_blank"
             href="https://www.youtube.com/@leerob"
-            className="flex w-full border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 no-underline items-center text-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900 hover:bg-neutral-100 transition-all justify-between"
+            className="flex w-full items-center justify-between rounded-lg border border-neutral-200 p-4 text-neutral-800 no-underline transition-all hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 hover:dark:bg-neutral-900"
           >
             <div className="flex items-center">
               <YoutubeIcon />
@@ -85,5 +81,5 @@ export default function AboutPage() {
         </div>
       </div>
     </section>
-  );
+  )
 }

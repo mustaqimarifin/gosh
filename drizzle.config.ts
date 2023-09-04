@@ -1,6 +1,6 @@
-import type { Config } from "drizzle-kit";
+import type { Config } from "drizzle-kit"
 
-export const connectionString = "postgresql://sos:7878@localhost:5432/postgres";
+export const connectionString = "postgresql://sos:7878@localhost:5432/postgres"
 
 export default {
   schema: "./drizzle/schema.ts",
@@ -9,4 +9,4 @@ export default {
   dbCredentials: {
     connectionString,
   },
-} satisfies Config;
+} satisfies Config

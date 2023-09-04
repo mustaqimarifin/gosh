@@ -7,5 +7,5 @@ export default function robots() {
     ],
     sitemap: "https://leerob.io/sitemap.xml",
     host: "https://leerob.io",
-  };
+  }
 }

@@ -1,0 +1,23 @@
+diff --git a/package.json b/package.json
+index 198b8999bc167af4858d97c8ec182c0d5d7d78e6..e5e577c5aff37100a4e127085de8b086ac43b333 100644
+--- a/package.json
++++ b/package.json
+@@ -15,9 +15,7 @@
+ 	"main": "dist/index.js",
+ 	"module": "dist/zod-prisma.esm.js",
+ 	"typings": "dist/index.d.ts",
+-	"bin": {
+-		"zod-prisma": "bin/cli.js"
+-	},
++	"bin": "bin/cli.js",
+ 	"keywords": [
+ 		"zod",
+ 		"prisma",
+@@ -84,5 +82,6 @@
+ 	},
+ 	"engines": {
+ 		"node": ">=14"
+-	}
++	},
++	"packageManager": "yarn@4.0.0-rc.49"
+ }

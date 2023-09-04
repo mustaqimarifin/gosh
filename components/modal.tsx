@@ -1,12 +1,14 @@
-"use client";
-import { Fragment, useRef, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { KittyColor } from "./icons";
+"use client"
+
+import { Dialog, Transition } from "@headlessui/react"
+import { Fragment, useRef, useState } from "react"
+
+import { KittyColor } from "./lolicon"
 
 export default function Modal() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(true)
 
-  const cancelButtonRef = useRef(null);
+  const cancelButtonRef = useRef(null)
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -83,5 +85,5 @@ export default function Modal() {
         </div>
       </Dialog>
     </Transition.Root>
-  );
+  )
 }

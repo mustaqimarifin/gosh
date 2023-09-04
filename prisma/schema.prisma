@@ -1,10 +1,21 @@
 generator client {
   provider = "prisma-client-js"
+  //previewFeatures = ["postgresqlExtensions"]
+}
+
+generator zod {
+  provider              = "zod-prisma"
+  output                = "./ZOD"
+  modelCase             = "camelCase"
+  relationModel         = true
+  modelSuffix           = "Schema"
+  prismaJsonNullability = false
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("SEX")
+  //extensions = [pgcrypto]
 }
 
 model Account {
@@ -37,48 +48,59 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  //role          Role        @default(USER)
   name          String
   email         String?   @unique
   emailVerified DateTime?
-  isAdmin       Boolean   @default(false)
-  image         String?
+  image         String?   @default("https:shorturl.at/chJK1")
   accounts      Account[]
   comments      Comment[]
   likes         Like[]
   sessions      Session[]
+  hotlines      Hotline[]
 }
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String
   expires    DateTime
 
   @@unique([identifier, token])
 }
 
 model Post {
-  id       String    @id @default(cuid())
-  slug     String?   @unique
+  slug     String    @id
   count    BigInt    @default(1)
   comments Comment[]
+
+  @@index([slug])
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  text      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id        String    @id @default(nanoid())
+  text      String /// @zod.max(10000)
+  createdAt DateTime
+  updatedAt DateTime?
   userId    String?
   parentId  String?
   slug      String?
   parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("ParentChild")
-  post      Post?     @relation(fields: [slug], references: [slug])
-  user      User?     @relation(fields: [userId], references: [id])
+  post      Post?     @relation(fields: [slug], references: [slug], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   likes     Like[]
 
-  @@index([userId, slug])
+  @@index([userId, slug, createdAt])
+}
+
+model Hotline {
+  id        String    @id @default(cuid())
+  text      String
+  createdAt DateTime
+  updatedAt DateTime?
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
 }
 
 model Like {

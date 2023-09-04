@@ -1,22 +1,27 @@
-import { defineDocumentType, makeSource } from "contentlayer/source-files";
-import remarkGfm from "remark-gfm";
-import rehypePrettyCode from "rehype-pretty-code";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import imageMetadata from "./lib/Meta2";
+import {
+  type ComputedFields,
+  defineDocumentType,
+  makeSource,
+} from "contentlayer/source-files"
+import rehypeAutolinkHeadings from "rehype-autolink-headings"
+import rehypePrettyCode, { type Options } from "rehype-pretty-code"
+import rehypeSlug from "rehype-slug"
+import remarkGfm from "remark-gfm"
 
-const computedFields = {
+import imageMetadata from "./lib/Meta2"
+
+const computedFields: ComputedFields = {
   slug: {
     type: "string",
     resolve: (doc) => doc._raw.flattenedPath,
   },
-  tweetIds: {
+  /*   tweetIds: {
     type: "list",
     resolve: (doc) => {
-      const tweetMatches = doc.body.raw.match(/<MDXTweet\sid="[0-9]+"\s\/>/g);
+      const tweetMatches = doc.body.raw.match(/<MeatTweet\sid="[0-9]+"\s\/>/g);
       return tweetMatches?.map((tweet) => tweet.match(/[0-9]+/g)[0]) || [];
     },
-  },
+  }, */
   /*   blurIDs: {
     type: 'list',
     resolve: (doc) => {
@@ -43,7 +48,7 @@ const computedFields = {
       },
     }),
   }, */
-};
+}
 
 /* const Image = defineNestedType(() => ({
   name: 'Image',
@@ -57,6 +62,25 @@ const computedFields = {
     hash: { type: 'string' },
   },
 })); */
+
+const options: Options = {
+  theme: "one-dark-pro",
+  keepBackground: false,
+  filterMetaString: (string) => string.replace(/filename="[^"]*"/, ""),
+  onVisitLine(node) {
+    // Prevent lines from collapsing in `display: grid` mode, and allow empty
+    // lines to be copy/pasted
+    if (node.children.length === 0) {
+      node.children = [{ type: "text", value: " " }]
+    }
+  },
+  onVisitHighlightedLine(node) {
+    node.properties?.className?.push("line--highlighted")
+  },
+  onVisitHighlightedChars(node) {
+    node.properties.className = ["word--highlighted"]
+  },
+}
 
 const Post = defineDocumentType(() => ({
   name: "Post",
@@ -79,9 +103,8 @@ const Post = defineDocumentType(() => ({
       type: "string",
     },
   },
-  // @ts-ignore
   computedFields,
-}));
+}))
 
 export default makeSource({
   contentDirPath: "data",
@@ -91,28 +114,7 @@ export default makeSource({
     rehypePlugins: [
       rehypeSlug,
       imageMetadata,
-      [
-        rehypePrettyCode,
-        {
-          theme: "one-dark-pro",
-          keepBackground: false,
-          filterMetaString: (string) => string.replace(/filename="[^"]*"/, ""),
-
-          onVisitLine(node) {
-            // Prevent lines from collapsing in `display: grid` mode, and allow empty
-            // lines to be copy/pasted
-            if (node.children.length === 0) {
-              node.children = [{ type: "text", value: " " }];
-            }
-          },
-          onVisitHighlightedLine(node) {
-            node.properties.className.push("line--highlighted");
-          },
-          onVisitHighlightedWord(node) {
-            node.properties.className = ["word--highlighted"];
-          },
-        },
-      ],
+      [rehypePrettyCode, options],
       [
         rehypeAutolinkHeadings,
         {
@@ -123,4 +125,4 @@ export default makeSource({
       ],
     ],
   },
-});
+})
