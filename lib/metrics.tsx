@@ -1,42 +1,76 @@
-"use server"
+import "server-only";
 
-import { LoadingSpinner } from "components/spinner"
-import { Suspense } from "react"
-import { api } from "server/trpc/rpc_client"
+import { google } from "googleapis";
+import { db } from "lib/planetscale";
+import { unstable_cache } from "next/cache";
+import { api } from "server/trpc/server-invoker";
 
-/*  const slug = window.location.href.substring(
-    window.location.href.lastIndexOf("/") + 1
-  )  */
+const googleAuth = new google.auth.GoogleAuth({
+  credentials: {
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_PRIVATE_KEY,
+  },
+  scopes: ["https://www.googleapis.com/auth/youtube.readonly"],
+});
 
-export async function BatchCounter({ slug }: { slug: string }) {
-  try {
-    const allViews = await api.viewsBySlug.query({ slug })
-    //console.log(allViews)
-    //const viewsForSlug = allViews && allViews.find((view) => view.slug === slug)
-    // const number = new Number(viewsForSlug?.count || 0)
-    return (
-      <Suspense fallback={<LoadingSpinner />}>
-        <p className=" flex-none text-sm font-semibold tracking-tighter text-red-400 ">
-          {`${allViews?.toString()} views`}
-        </p>
-      </Suspense>
-    )
-  } catch (err) {
-    console.log(err)
-  }
-}
+const youtube = google.youtube({
+  version: "v3",
+  auth: googleAuth,
+});
 
-export async function FullCounter() {
-  try {
-    const views = await api.totalViews.query()
-    return (
-      <Suspense fallback={<LoadingSpinner />}>
-        <p className=" flex-none text-sm font-semibold tracking-tighter text-red-400 ">
-          {`${views} views`}
-        </p>
-      </Suspense>
-    )
-  } catch (error) {
-    console.log(error)
-  }
-}
+export const getBlogViews = unstable_cache(
+  async (slug) => {
+    if (!process.env.SQL) {
+      return 0;
+    }
+
+    const data = await api.viewsBySlug.query({ slug });
+    return `${data && data[0].count} views`;
+  },
+  ["blog-views-sum"],
+  {
+    revalidate: 5,
+  },
+);
+
+export const getViewsCount = unstable_cache(
+  async () => {
+    return db.selectFrom("post").select(["slug", "count"]).execute();
+  },
+  ["all-views"],
+  {
+    revalidate: 5,
+  },
+);
+
+export const getLeeYouTubeSubs = unstable_cache(
+  async () => {
+    const response = await youtube.channels.list({
+      id: ["UCd-pjthLQYLYVdN7GNwJgyA"],
+      part: ["statistics"],
+    });
+
+    const channel = response.data.items![0];
+    return Number(channel?.statistics?.subscriberCount);
+  },
+  ["youtube-subs"],
+  {
+    revalidate: 3600,
+  },
+);
+
+export const getVercelYouTubeSubs = unstable_cache(
+  async () => {
+    const response = await youtube.channels.list({
+      id: ["UCLq8gNoee7oXM7MvTdjyQvA"],
+      part: ["statistics"],
+    });
+
+    const channel = response.data.items![0];
+    return Number(channel?.statistics?.subscriberCount);
+  },
+  ["vercel-youtube-subs"],
+  {
+    revalidate: 3600,
+  },
+);

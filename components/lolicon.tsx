@@ -1,4 +1,4 @@
-import { type JSX, type SVGProps } from "react"
+import { type JSX, type SVGProps } from "react";
 
 export function TwitterIcon() {
   return (
@@ -22,7 +22,7 @@ export function TwitterIcon() {
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }
 
 export function GitHubIcon() {
@@ -46,7 +46,7 @@ export function GitHubIcon() {
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }
 
 export function ViewsIcon() {
@@ -67,7 +67,7 @@ export function ViewsIcon() {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
 
 export function ArrowIcon() {
@@ -85,7 +85,7 @@ export function ArrowIcon() {
         fill="currentColor"
       />
     </svg>
-  )
+  );
 }
 
 export function YoutubeIcon() {
@@ -100,7 +100,7 @@ export function YoutubeIcon() {
     >
       <path d="M365.257 67.393H95.744C42.866 67.393 0 110.259 0 163.137v134.728c0 52.878 42.866 95.744 95.744 95.744h269.513c52.878 0 95.744-42.866 95.744-95.744V163.137c0-52.878-42.866-95.744-95.744-95.744zm-64.751 169.663-126.06 60.123c-3.359 1.602-7.239-.847-7.239-4.568V168.607c0-3.774 3.982-6.22 7.348-4.514l126.06 63.881c3.748 1.899 3.683 7.274-.109 9.082z" />
     </svg>
-  )
+  );
 }
 
 export function KittyIcon() {
@@ -174,7 +174,7 @@ export function KittyIcon() {
         />
       </g>
     </svg>
-  )
+  );
 }
 export function KittyColor() {
   return (
@@ -262,7 +262,7 @@ export function KittyColor() {
         d="M473.4 170.39c-7.27 0-11.34-6.82-8.42-13.71 2.74-6.31 5.47-12.52 8.35-18.71 2.59-5.7 12.75-9.31 17.51-6.31 5.21 3.29 5.47 9.93 1.35 16.44-3.29 5.05-6.23 10.3-9.01 15.65-2.23 4.15-4.84 7.23-9.78 6.64Z"
       />
     </svg>
-  )
+  );
 }
 
 export function GoogleIcon() {
@@ -278,7 +278,7 @@ export function GoogleIcon() {
     >
       <path d="M0 105C0 47.103 47.103 0 105 0c23.383 0 45.515 7.523 64.004 21.756l-24.4 31.696C133.172 44.652 119.477 40 105 40c-35.841 0-65 29.159-65 65s29.159 65 65 65c28.867 0 53.398-18.913 61.852-45H105V85h105v20c0 57.897-47.103 105-105 105S0 162.897 0 105z"></path>
     </svg>
-  )
+  );
 }
 
 export function Bean() {
@@ -372,11 +372,11 @@ export function Bean() {
         </path>
       </g>
     </svg>
-  )
+  );
 }
 
 export const UserPH = (
-  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
 ) => {
   return (
     <svg
@@ -391,11 +391,11 @@ export const UserPH = (
         clipRule="evenodd"
       />
     </svg>
-  )
-}
+  );
+};
 
 export const Plus = (
-  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
 ) => {
   return (
     <svg
@@ -410,5 +410,5 @@ export const Plus = (
       <circle cx="12" cy="12" r="10" />
       <path d="M12 8v8M8 12h8" />
     </svg>
-  )
-}
+  );
+};

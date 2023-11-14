@@ -1,88 +1,51 @@
 import {
-  type ComputedFields,
+  ComputedFields,
   defineDocumentType,
   makeSource,
-} from "contentlayer/source-files"
-import rehypeAutolinkHeadings from "rehype-autolink-headings"
-import rehypePrettyCode, { type Options } from "rehype-pretty-code"
-import rehypeSlug from "rehype-slug"
-import remarkGfm from "remark-gfm"
-
-import imageMetadata from "./lib/Meta2"
+} from "contentlayer/source-files";
+import remarkGfm from "remark-gfm";
+import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import imageMetadata from "./lib/Meta2";
+import imageMetadata3 from "./lib/Meta3";
 
 const computedFields: ComputedFields = {
   slug: {
     type: "string",
     resolve: (doc) => doc._raw.flattenedPath,
   },
-  /*   tweetIds: {
+  tweetIds: {
     type: "list",
     resolve: (doc) => {
-      const tweetMatches = doc.body.raw.match(/<MeatTweet\sid="[0-9]+"\s\/>/g);
+      const tweetMatches = doc.body.raw.match(
+        /<StaticTweet\sid="[0-9]+"\s\/>/g,
+      );
       return tweetMatches?.map((tweet) => tweet.match(/[0-9]+/g)[0]) || [];
     },
-  }, */
-  /*   blurIDs: {
-    type: 'list',
-    resolve: (doc) => {
-      const blurMatches = doc.body.raw.match(/<Image\sid="[0-9]+"\s\/>/g);
-      return tweetMatches?.map((tweet) => tweet.match(/[0-9]+/g)[0]) || [];
-    },
-  }, */
-  /*   structuredData: {
-    type: 'json',
+  },
+  structuredData: {
+    type: "json",
     resolve: (doc) => ({
-      '@context': 'https://schema.org',
-      '@type': 'BlogPosting',
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
       headline: doc.title,
       datePublished: doc.date,
       dateModified: doc.date,
       description: doc.summary,
       image: doc.image
-        ? `https://leerob.io${doc.image}`
-        : `https://leerob.io/api/og?title=${doc.title}`,
-      url: `https://leerob.io/blog/${doc._raw.flattenedPath}`,
+        ? `http://localhost:3000${doc.image}`
+        : `http://localhost:3000/og?title=${doc.title}`,
+      url: `http://localhost:3000/blog/${doc._raw.flattenedPath}`,
       author: {
-        '@type': 'Person',
-        name: 'Lee Robinson',
+        "@type": "Person",
+        name: "Lee Robinson",
       },
     }),
-  }, */
-}
+  },
+};
 
-/* const Image = defineNestedType(() => ({
-  name: 'Image',
-  fields: {
-    id: { type: 'string' },
-    title: { type: 'string' },
-    description: { type: 'string' },
-    src: { type: 'string', required: true },
-    width: { type: 'number' },
-    height: { type: 'number' },
-    hash: { type: 'string' },
-  },
-})); */
-
-const options: Options = {
-  theme: "one-dark-pro",
-  keepBackground: false,
-  filterMetaString: (string) => string.replace(/filename="[^"]*"/, ""),
-  onVisitLine(node) {
-    // Prevent lines from collapsing in `display: grid` mode, and allow empty
-    // lines to be copy/pasted
-    if (node.children.length === 0) {
-      node.children = [{ type: "text", value: " " }]
-    }
-  },
-  onVisitHighlightedLine(node) {
-    node.properties?.className?.push("line--highlighted")
-  },
-  onVisitHighlightedChars(node) {
-    node.properties.className = ["word--highlighted"]
-  },
-}
-
-const Post = defineDocumentType(() => ({
+export const Post = defineDocumentType(() => ({
   name: "Post",
   filePathPattern: `**/*.mdx`,
   contentType: "mdx",
@@ -104,7 +67,7 @@ const Post = defineDocumentType(() => ({
     },
   },
   computedFields,
-}))
+}));
 
 export default makeSource({
   contentDirPath: "data",
@@ -113,8 +76,26 @@ export default makeSource({
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
+      [
+        rehypePrettyCode,
+        {
+          theme: "one-dark-pro",
+          onVisitLine(node) {
+            // Prevent lines from collapsing in `display: grid` mode, and allow empty
+            // lines to be copy/pasted
+            if (node.children.length === 0) {
+              node.children = [{ type: "text", value: " " }];
+            }
+          },
+          onVisitHighlightedLine(node) {
+            node.properties.className.push("line--highlighted");
+          },
+          onVisitHighlightedChars(node) {
+            node.properties.className = ["word--highlighted"];
+          },
+        },
+      ],
       imageMetadata,
-      [rehypePrettyCode, options],
       [
         rehypeAutolinkHeadings,
         {
@@ -125,4 +106,4 @@ export default makeSource({
       ],
     ],
   },
-})
+});

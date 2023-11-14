@@ -1,25 +1,24 @@
 generator client {
-  provider = "prisma-client-js"
-  //previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 generator zod {
   provider              = "zod-prisma"
   output                = "./ZOD"
-  modelCase             = "camelCase"
-  relationModel         = true
+  relationModel         = "true"
   modelSuffix           = "Schema"
-  prismaJsonNullability = false
+  modelCase             = "camelCase"
+  prismaJsonNullability = "false"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("SEX")
-  //extensions = [pgcrypto]
+  provider = "postgresql"
+  url      = env("SQL")
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(dbgenerated("nanoid()"))
   userId            String
   type              String
   provider          String
@@ -37,8 +36,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+  sessionToken String   @id @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -47,16 +45,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String            @id @default(dbgenerated("nanoid()"))
   name          String
-  email         String?   @unique
+  email         String?           @unique
   emailVerified DateTime?
-  image         String?   @default("https:shorturl.at/chJK1")
+  image         String?           @default("https://emojis.slackmojis.com/emojis/images/1643514738/7421/typingcat.gif?1643514738")
+  level         Level?
   accounts      Account[]
   comments      Comment[]
+  reactions     CommentReaction[]
+  hotlines      Hotline[]
   likes         Like[]
   sessions      Session[]
-  hotlines      Hotline[]
 }
 
 model VerificationToken {
@@ -69,34 +69,36 @@ model VerificationToken {
 
 model Post {
   slug     String    @id
-  count    BigInt    @default(1)
+  count    BigInt?   @default(1)
   comments Comment[]
 
   @@index([slug])
 }
 
 model Comment {
-  id        String    @id @default(nanoid())
-  text      String /// @zod.max(10000)
-  createdAt DateTime
-  updatedAt DateTime?
+  id        Int               @id @default(autoincrement())
+  /// @zod.max(10000)
+  text      String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime?         @updatedAt
   userId    String?
-  parentId  String?
+  parentId  Int?
   slug      String?
-  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
-  replies   Comment[] @relation("ParentChild")
-  post      Post?     @relation(fields: [slug], references: [slug], onDelete: Cascade)
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Comment?          @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]         @relation("ParentChild")
+  post      Post?             @relation(fields: [slug], references: [slug], onDelete: Cascade)
+  user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions CommentReaction[]
   likes     Like[]
 
   @@index([userId, slug, createdAt])
 }
 
 model Hotline {
-  id        String    @id @default(cuid())
+  id        String    @id @default(dbgenerated("nanoid()"))
   text      String
-  createdAt DateTime
-  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
   userId    String?
   user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -105,9 +107,40 @@ model Hotline {
 
 model Like {
   userId    String
-  commentId String
+  commentId Int
   comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, commentId])
+}
+
+model Reaction {
+  type      String            @id @unique
+  createdAt DateTime          @default(now())
+  label     String
+  url       String
+  metadata  Json?
+  reactions CommentReaction[]
+}
+
+model CommentReaction {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  commentId    Int?
+  userId       String?
+  reactionType String
+  comment      Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reaction     Reaction @relation(fields: [reactionType], references: [type], onDelete: Cascade)
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId, reactionType])
+}
+
+enum Level {
+  NONE
+  NOOB
+  LORD
+  MANNEQUIN
+  AI
+  ADMIN
 }

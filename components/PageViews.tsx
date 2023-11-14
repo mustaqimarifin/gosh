@@ -1,11 +1,10 @@
-"use client"
+'use client'
 
-import { pageCount } from "app/_actions"
-import { fetcher } from "lib/fetcher"
-import { Suspense, useEffect } from "react"
-import useSWR from "swr"
+import fetcher from 'lib/fetcher'
+import { Suspense, useEffect } from 'react'
+import useSWR from 'swr'
 
-import { LoadingSpinner } from "./spinner"
+import { LoadingSpinner } from './spinner'
 
 export type CounterProps = {
   slug?: string
@@ -14,25 +13,34 @@ export type CounterProps = {
 }
 
 export const PageViews = ({ slug, trackView }: CounterProps) => {
-  const { data, isLoading } = useSWR<CounterProps>(`/api/posts/${slug}`, fetcher)
+  const { data, isLoading } = useSWR<CounterProps>(
+    `/api/posts/${slug}`,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  )
 
   useEffect(() => {
     const registerView = () =>
       fetch(`/api/posts/${slug}`, {
-        method: "POST",
+        method: 'POST',
       })
     if (trackView) {
       registerView()
     }
-  }, [slug, trackView])
+  }, [])
 
-  return  isLoading ? <LoadingSpinner/> :`${data?.total} views`
-  
+  if (!data) return null
+  if (isLoading) return <LoadingSpinner />
+  else return <p className="text-xs">{`${data?.total} views`}</p>
 }
 
 export const TotalViews = () => {
   const { data, isLoading } = useSWR<CounterProps>(`/api/posts`, fetcher)
-  return isLoading ? <LoadingSpinner/> :`${data?.total} views`
-
-  
+  if (!data) return null
+  if (isLoading) return <LoadingSpinner />
+  else return <p className="text-xs">{`${data?.total} views`}</p>
 }

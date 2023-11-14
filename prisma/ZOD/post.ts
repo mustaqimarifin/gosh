@@ -3,7 +3,7 @@ import { CompleteComment, relatedCommentSchema } from "./index"
 
 export const postSchema = z.object({
   slug: z.string(),
-  count: z.bigint(),
+  count: z.bigint().nullish(),
 })
 
 export interface CompletePost extends z.infer<typeof postSchema> {

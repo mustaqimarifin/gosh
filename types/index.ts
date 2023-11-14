@@ -1,7 +1,5 @@
-import { CompleteComment } from "prisma/ZOD"
-import { type ReadTimeResults } from "reading-time"
-
-import { Post } from ".contentlayer/generated/types"
+import { User } from '@prisma/client'
+import { CompleteComment } from 'prisma/ZOD'
 
 //^SPOTIFY^//
 export type Song = {
@@ -58,11 +56,10 @@ export type SiteConfig = {
   }
 }
 
-export type ContentType = "blog" | "Project" | "Scribble"
+export type ContentType = 'blog' | 'Project' | 'Scribble'
 
 export type PostMeta = {
   wordCount: number
-  readingTime: ReadTimeResults
   slug: string
   title: string
   code: string
@@ -75,9 +72,9 @@ export type PostMeta = {
   repost?: string
 }
 
-export type PickMeta<T extends ContentType> = T extends "blog"
+export type PickMeta<T extends ContentType> = T extends 'blog'
   ? PostMeta
-  : T extends "Scribble"
+  : T extends 'Scribble'
   ? ScribbleMeta
   : ProjectMeta
 
@@ -115,11 +112,11 @@ export type MetaWithTags = PostMeta | ScribbleMeta
 export type MetaWithDate = PostMeta | ProjectMeta
 export type Meta = ProjectMeta | PostMeta | ScribbleMeta
 
-export type HeroIcon = (props: React.ComponentProps<"svg">) => JSX.Element
+export type HeroIcon = (props: React.ComponentProps<'svg'>) => JSX.Element
 
-export type PostType = "Post" | "Page" | "Project"
+export type PostType = 'Post' | 'Page' | 'Project'
 
-export type PostStatus = "Idea" | "Published" | "Revise"
+export type PostStatus = 'Idea' | 'Published' | 'Revise'
 
 export type PostX = {
   id: string
@@ -137,19 +134,19 @@ export interface Komment extends CompleteComment {
   isDeleted?: boolean
 }
 
-type AuthorAssociation = "NOOB" | "LORD" | "MANNEQUIN" | "AI" | "NONE"
+type AuthorAssociation = 'NOOB' | 'LORD' | 'MANNEQUIN' | 'AI' | null
 
-export interface PostT extends Post {
+/* export interface PostT extends Post {
   comments?: Comment[]
 }
-
+ */
 export type Comment = {
-  id: string
+  id: number
   text: string
   slug: string
   createdAt: Date
   updatedAt: Date
-  parentId: string | null
+  parentId: number | null
   user: {
     id: string
     name: string
@@ -158,8 +155,35 @@ export type Comment = {
   }
   likeCount: number
   likedByMe: boolean
-  commentId?: string
+  commentId?: number
   highlight?: boolean
   isDeleted?: boolean
   replies?: Comment[]
+  continueThread?: boolean
+  replyCount: number
+  reactionMetadata: CommentReactionMetadata[]
+}
+
+export type Reaction = {
+  type: string
+  createdAt: Date
+  label: string
+  url: string
+  metadata: any
+}
+
+export type CommentReaction = {
+  id: number
+  userId: string
+  commentId: string
+  reactionType: string
+  createdAt: Date
+  user: User
+}
+
+export type CommentReactionMetadata = {
+  commentId: number
+  reactionType: string
+  reactionCount: number
+  active_for_user?: boolean
 }

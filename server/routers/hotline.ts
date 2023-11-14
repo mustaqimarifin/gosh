@@ -1,7 +1,6 @@
-import { Prisma } from "@prisma/client"
-import { TRPCError } from "@trpc/server"
-import { protectedProcedure, publicProcedure, router } from "server/context"
-import { z } from "zod"
+import { Prisma } from "@prisma/client";
+import { protectedProcedure, publicProcedure, router } from "server/context";
+import { z } from "zod";
 
 export const scrape = Prisma.validator<Prisma.HotlineSelect>()({
   id: true,
@@ -14,11 +13,11 @@ export const scrape = Prisma.validator<Prisma.HotlineSelect>()({
       image: true,
     },
   },
-})
+});
 
 export const hotRouter = router({
   getHot: publicProcedure.query(async (opts) => {
-    const entries = await opts.ctx.prisma.hotline.findMany({
+    const entries = await opts.ctx.db.hotline.findMany({
       include: {
         user: {
           select: {
@@ -28,26 +27,25 @@ export const hotRouter = router({
           },
         },
       },
-    })
-    return entries
+    });
+    return entries;
   }),
   addHot: protectedProcedure
     .input(
       z.object({
         text: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
-      const entry = await ctx.prisma.hotline.create({
+      const entry = await ctx.db.hotline.create({
         data: {
           text: input.text,
           userId: ctx.session!.user.id,
-                      createdAt: new Date()
-
+          createdAt: new Date(),
         },
-      })
+      });
       return {
         entry,
-      }
+      };
     }),
-})
+});

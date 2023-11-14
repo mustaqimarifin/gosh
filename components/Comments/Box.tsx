@@ -1,41 +1,41 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react"
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   autosize,
   cx,
   handleCommentClick,
   resizeTextArea,
   User,
-} from "lib/utils"
-import { BookMarkedIcon, GithubIcon, TypeIcon } from "lucide-react"
-import { signIn, signOut, useSession } from "next-auth/react"
+} from "lib/utils";
+import { BookMarkedIcon, GithubIcon, TypeIcon } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import {
   type ChangeEvent,
   useCallback,
   useEffect,
   useRef,
   useState,
-} from "react"
+} from "react";
 
 interface CommentFormProps {
-  autoFocus?: boolean
-  buttonText?: string
-  initialValue?: string
-  className?: string
-  context?: string
-  error?: string
-  onSubmit: (text: string) => Promise<void>
-  parentId?: string
-  placeholder?: string
-  submitLabel?: string
-  handleResetCallback?: () => void
-  hideEarlyCallback?: () => void
+  autoFocus?: boolean;
+  buttonText?: string;
+  initialValue?: string;
+  className?: string;
+  context?: string;
+  error?: string;
+  onSubmit: (text: string) => Promise<void>;
+  parentId?: string;
+  placeholder?: string;
+  submitLabel?: string;
+  handleResetCallback?: () => void;
+  hideEarlyCallback?: () => void;
 }
 export function processCommentBody(bodyHTML: string) {
   if (typeof document === "undefined") {
     return bodyHTML.replace(
       /<a (href="[^"]*")/g,
-      '<a $1 rel="noopener noreferrer nofollow" target="_top"'
-    )
+      '<a $1 rel="noopener noreferrer nofollow" target="_top"',
+    );
   }
 }
 export const CommentForm = ({
@@ -50,44 +50,44 @@ export const CommentForm = ({
   parentId,
   onSubmit,
 }: CommentFormProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [text, setText] = useState(initialValue)
-  const { data: session } = useSession()
-  const [parent] = useAutoAnimate<HTMLDivElement>()
-  const textRef = useRef<HTMLTextAreaElement | null>(null)
-  const [isPreview, setIsPreview] = useState<boolean | string>(false)
-  const [input, setInput] = useState("")
-  const [lastInput, setLastInput] = useState("")
-  const [preview, setPreview] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isReplyOpen, setIsReplyOpen] = useState(false)
-  const [isFixedWidth, setIsFixedWidth] = useState(false)
-  const [lastHeight, setLastHeight] = useState("")
-  const textarea = useRef<HTMLTextAreaElement>(null)
-  const isReply = !!parentId
-  const placeHolderText = isReply ? "writeAReply" : "writeAComment"
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [text, setText] = useState(initialValue);
+  const { data: session } = useSession();
+  const [parent] = useAutoAnimate<HTMLDivElement>();
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isPreview, setIsPreview] = useState<boolean | string>(false);
+  const [input, setInput] = useState("");
+  const [lastInput, setLastInput] = useState("");
+  const [preview, setPreview] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [isFixedWidth, setIsFixedWidth] = useState(false);
+  const [lastHeight, setLastHeight] = useState("");
+  const textarea = useRef<HTMLTextAreaElement>(null);
+  const isReply = !!parentId;
+  const placeHolderText = isReply ? "writeAReply" : "writeAComment";
 
   useEffect(() => {
     if (isPreview && input !== lastInput) {
       if (input) {
-        setIsLoading(true)
+        setIsLoading(true);
         // renderMarkdown(input, session, context).then((value) => {
-        const processed = processCommentBody(input)
-        setPreview(processed!)
-        setIsLoading(false)
+        const processed = processCommentBody(input);
+        setPreview(processed!);
+        setIsLoading(false);
         //});
       }
-      setLastInput(input)
+      setLastInput(input);
     }
-  }, [isPreview, input, lastInput, session, context])
+  }, [isPreview, input, lastInput, session, context]);
 
   const reset = useCallback(() => {
-    setInput("")
-    setPreview("")
-    setIsPreview(false)
-    setIsSubmitting(false)
-    setIsReplyOpen(false)
-  }, [])
+    setInput("");
+    setPreview("");
+    setIsPreview(false);
+    setIsSubmitting(false);
+    setIsReplyOpen(false);
+  }, []);
 
   /* const handleSubmit = useCallback(async () => {
     if (isSubmitting || (!slug && !onDiscussionCreateRequest)) return;
@@ -125,61 +125,61 @@ export const CommentForm = ({
   ]); */
 
   const handleReplyOpen = () => {
-    setIsReplyOpen(true)
-  }
+    setIsReplyOpen(true);
+  };
 
   const handleTextAreaChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
-      setInput(event.target.value)
+      setInput(event.target.value);
       // Only resize if it hasn't been resized manually.
       if (!lastHeight || lastHeight === textarea.current?.style.height) {
-        resizeTextArea(textarea.current)
-        setLastHeight(textarea.current!.style.height)
+        resizeTextArea(textarea.current);
+        setLastHeight(textarea.current!.style.height);
       }
     },
-    [lastHeight]
-  )
+    [lastHeight],
+  );
 
   useEffect(() => {
-    if (!textarea.current) return
-    if (isReplyOpen) textarea.current.focus()
-  }, [isReplyOpen])
+    if (!textarea.current) return;
+    if (isReplyOpen) textarea.current.focus();
+  }, [isReplyOpen]);
   useEffect(() => {
     if (autoFocus) {
       if (textRef && textRef.current) {
-        textRef.current.focus()
+        textRef.current.focus();
       }
     }
-  }, [autoFocus])
+  }, [autoFocus]);
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>): void {
-    setText(e.target.value)
+    setText(e.target.value);
     if (textRef?.current) {
-      autosize(textRef.current)
+      autosize(textRef.current);
     }
   }
 
   function handleReset(): void {
-    setText("")
+    setText("");
     if (textRef && textRef.current) {
-      textRef.current.style.height = "initial"
+      textRef.current.style.height = "initial";
     }
-    setIsLoading(false)
+    setIsLoading(false);
   }
   const handleSubmit = useCallback(
     (e: React.SyntheticEvent) => {
-      e.preventDefault()
+      e.preventDefault();
       onSubmit(input).then(() => {
-        setText("")
-        setIsLoading(true)
-        hideEarlyCallback?.()
+        setText("");
+        setIsLoading(true);
+        hideEarlyCallback?.();
         //handleReset()
-        handleResetCallback?.()
-        reset()
-      })
+        handleResetCallback?.();
+        reset();
+      });
     },
-    [isSubmitting, input, parentId, session, onSubmit, reset]
-  )
+    [isSubmitting, input, parentId, session, onSubmit, reset],
+  );
 
   return !isReply || isReplyOpen ? (
     <form
@@ -221,8 +221,8 @@ export const CommentForm = ({
               type="button"
               title={isFixedWidth ? "disableFixedWidth" : "enableFixedWidth"}
               onClick={() => {
-                setIsFixedWidth(!isFixedWidth)
-                textarea.current!.focus()
+                setIsFixedWidth(!isFixedWidth);
+                textarea.current!.focus();
               }}
               tabIndex={-1}
             >
@@ -325,8 +325,8 @@ export const CommentForm = ({
         {"writeAReply"}
       </button>
     </div>
-  )
-}
+  );
+};
 
 /* <form onSubmit={handleSubmit}>
    <div className="mt-4 flex flex-row">

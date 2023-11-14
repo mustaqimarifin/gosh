@@ -1,21 +1,16 @@
-import "./global.css"
+import "./global.css";
 
-import { Analytics } from "@vercel/analytics/react"
-import { cx } from "lib/utils"
-import type { Metadata } from "next"
-import localFont from "next/font/local"
+import { Analytics } from "@vercel/analytics/react";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
+import { cx } from "lib/utils";
+import type { Metadata } from "next";
 
-import Sidebar from "../components/sidebar"
-import { TrpcProvider } from "./providers"
-
-const kaisei = localFont({
-  src: "../public/fonts/kaisei-tokumin-latin-700-normal.woff2",
-  weight: "700",
-  variable: "--kaisei",
-  display: "swap",
-})
+import Sidebar from "../components/sidebar";
+import { TrpcProvider } from "./providers";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title: {
     default: "Lee Robinson",
     template: "%s | Lee Robinson",
@@ -24,16 +19,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lee Robinson",
     description: "Developer, writer, and creator.",
-    url: "https://leerob.io",
+    url: "http://localhost:3000",
     siteName: "Lee Robinson",
-    images: [
-      {
-        url: "https://leerob.io/og.jpg",
-        width: 1920,
-        height: 1080,
-      },
-    ],
-    locale: "en-US",
+    locale: "en_US",
     type: "website",
   },
   robots: {
@@ -51,31 +39,33 @@ export const metadata: Metadata = {
     title: "Lee Robinson",
     card: "summary_large_image",
   },
-  icons: {
-    shortcut: "/favicon.ico",
+  verification: {
+    google: "eZSdmzAXlLkKhNJzfgwDqWORghxnJ8qR9_CHdAh5-xw",
+    yandex: "14d2e73487fa6c71",
   },
-}
+};
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html
       lang="en"
       className={cx(
-        "bg-white text-black dark:bg-[#111010] dark:text-white",
-        kaisei.variable
+        "text-black bg-white dark:text-white dark:bg-[#111010]",
+        GeistSans.variable,
+        GeistMono.variable,
       )}
     >
-      <body className="mx-4 mb-40 mt-8 flex max-w-4xl flex-col antialiased md:mt-20 md:flex-row lg:mx-auto lg:mt-32">
-        <Sidebar />
-        <main className="mt-6 flex min-w-0 flex-auto flex-col px-2 md:mt-0 md:px-0">
+      <body className="antialiased max-w-2xl mb-40 flex flex-col md:flex-row mx-4 mt-8 lg:mx-auto">
+        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+          <Sidebar />
           <TrpcProvider>{children}</TrpcProvider>
           <Analytics />
         </main>
       </body>
     </html>
-  )
+  );
 }

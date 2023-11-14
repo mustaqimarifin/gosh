@@ -18,7 +18,7 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: true,
+    //project: true,
     ecmaVersion: "latest",
     sourceType: "module",
   },
@@ -65,10 +65,11 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/ban-types": 0,
+    "@typescript-eslint/no-base-to-string": 0,
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/no-extra-semi": 0,
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@next/next/no-img-element": "off",
     "@next/next/no-html-link-for-pages": "off",
   },
-}
+};

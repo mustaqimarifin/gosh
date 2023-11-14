@@ -1,28 +1,28 @@
-import { Prisma } from "@prisma/client"
-import { TRPCError } from "@trpc/server"
-import { protectedProcedure, publicProcedure, router } from "server/context"
-import { z } from "zod"
+import { Prisma } from '@prisma/client'
+import { TRPCError } from '@trpc/server'
+import { protectedProcedure, publicProcedure, router } from 'server/context'
+import { z } from 'zod'
 
 export const scrape = Prisma.validator<Prisma.PostSelect>()({
   slug: true,
-  //count: true,
   _count: {
     select: { comments: true },
   },
   comments: {
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: 'desc' },
     select: {
       id: true,
       slug: true,
       text: true,
-      //replies:true,
       parentId: true,
       createdAt: true,
+      reactions: true,
       user: {
         select: {
           id: true,
           name: true,
           image: true,
+          level: true,
         },
       },
       _count: { select: { likes: true } },
@@ -34,11 +34,11 @@ export const postRouter = router({
   getCommentByID: publicProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.number(),
       })
     )
     .query(async ({ input, ctx }) => {
-      const comment = await ctx.prisma.comment.findUnique({
+      const comment = await ctx.db.comment.findUnique({
         where: input,
       })
       return comment?.id
@@ -50,11 +50,11 @@ export const postRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const post = await ctx.prisma.post.findUnique({
+      const post = await ctx.db.post.findUnique({
         where: input,
         select: scrape,
       })
-      const likes = await ctx.prisma.like.findMany({
+      const likes = await ctx.db.like.findMany({
         where: {
           userId: ctx.session?.user?.id,
           commentId: {
@@ -81,7 +81,7 @@ export const postRouter = router({
   viewsBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
-      const views = await ctx.prisma.post.findMany({
+      const views = await ctx.db.post.findMany({
         where: input,
         select: {
           //slug: true,
@@ -93,10 +93,10 @@ export const postRouter = router({
       //if (x.count === null) return null
       //if (x.count > 1) return x.count
 
-      return views[0].count
+      return views
     }),
   totalViews: publicProcedure.query(async ({ ctx }) => {
-    const total = await ctx.prisma.post.aggregate({
+    const total = await ctx.db.post.aggregate({
       _sum: {
         count: true,
       },
@@ -106,7 +106,7 @@ export const postRouter = router({
   addViewCount: publicProcedure
     .input(z.object({ slug: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const total = await ctx.prisma.post.upsert({
+      const total = await ctx.db.post.upsert({
         where: input,
         create: input,
         update: {
@@ -117,7 +117,7 @@ export const postRouter = router({
       })
 
       /*       if (total?.count < 1) return null
-      total = await ctx.prisma.post.findUnique({
+      total = await ctx.db.post.findUnique({
         where: {
           slug: input.slug,
         },
@@ -128,33 +128,33 @@ export const postRouter = router({
       return { total }
     }),
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.post.findMany()
+    return ctx.db.post.findMany()
   }),
   commentCount: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.comment.count({ where: { slug: input.slug } })
+      return await ctx.db.comment.count({ where: { slug: input.slug } })
     }),
   addComment: protectedProcedure
     .input(
       z.object({
         slug: z.string(),
-        parentId: z.string().optional(),
+        parentId: z.number().optional(),
         text: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.post.findUnique({
+      await ctx.db.post.findUnique({
         where: { slug: input.slug },
       })
-      return await ctx.prisma.comment
+      return await ctx.db.comment
         .create({
           data: {
             slug: input.slug,
             text: input.text,
             parentId: input.parentId,
             userId: ctx.session!.user.id,
-            createdAt: new Date()
+            createdAt: new Date(),
           },
           select: {
             slug: true,
@@ -172,54 +172,53 @@ export const postRouter = router({
   updateComment: protectedProcedure
     .input(
       z.object({
-        commentId: z.string(),
+        commentId: z.number(),
         text: z.string(),
-        updatedAt: z.date()
+        updatedAt: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const res = await ctx.prisma.comment.findUnique({
+      const res = await ctx.db.comment.findUnique({
         where: { id: input.commentId },
         select: { userId: true },
       })
 
       if (res?.userId !== ctx.session!.user.id) {
         throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You do not have permission to update this comment",
+          code: 'UNAUTHORIZED',
+          message: 'You do not have permission to update this comment',
         })
       }
 
-      return await ctx.prisma.comment.update({
+      return await ctx.db.comment.update({
         where: {
           id: input.commentId,
         },
         data: {
           text: input.text,
-          updatedAt:new Date()
-
-        }
+          updatedAt: new Date(),
+        },
       })
     }),
   deleteComment: protectedProcedure
     .input(
       z.object({
-        commentId: z.string(),
+        commentId: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const res = await ctx.prisma.comment.findUnique({
+      const res = await ctx.db.comment.findUnique({
         where: { id: input.commentId },
         select: { userId: true },
       })
       if (res?.userId !== ctx.session?.user.id) {
         throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You do not have permission to delete this comment",
+          code: 'UNAUTHORIZED',
+          message: 'You do not have permission to delete this comment',
         })
       }
 
-      return await ctx.prisma.comment.delete({
+      return await ctx.db.comment.delete({
         where: {
           id: input.commentId,
         },
@@ -228,15 +227,15 @@ export const postRouter = router({
   toggleLike: protectedProcedure
     .input(
       z.object({
-        commentId: z.string(),
+        commentId: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.comment.findUnique({
+      await ctx.db.comment.findUnique({
         where: { id: input.commentId },
         select: { userId: true },
       })
-      const like = await ctx.prisma.like.findUnique({
+      const like = await ctx.db.like.findUnique({
         where: {
           userId_commentId: {
             commentId: input.commentId,
@@ -246,7 +245,7 @@ export const postRouter = router({
       })
 
       if (like === null) {
-        return await ctx.prisma.like
+        return await ctx.db.like
           .create({
             data: {
               commentId: input.commentId,
@@ -257,7 +256,7 @@ export const postRouter = router({
             return { addLike: true }
           })
       } else {
-        return await ctx.prisma.like
+        return await ctx.db.like
           .delete({
             where: {
               userId_commentId: {
@@ -271,4 +270,113 @@ export const postRouter = router({
           })
       }
     }),
+
+  getReactions: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.db.reaction.findMany({
+      orderBy: { type: 'asc' },
+    })
+  }),
+  getReaction: publicProcedure
+    .input(
+      z.object({
+        type: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      return await ctx.db.reaction.findUnique({
+        where: input,
+      })
+    }),
+  getCommentReactions: publicProcedure
+    .input(
+      z.object({
+        reactionType: z.string(),
+        commentId: z.number(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      return await ctx.db.commentReaction.findUnique({
+        where: {
+          userId_commentId_reactionType: {
+            commentId: input.commentId,
+            userId: ctx.session!.user.id,
+            reactionType: input.reactionType,
+          },
+        },
+      })
+    }),
+  addCommentReaction: protectedProcedure
+    .input(
+      z.object({
+        reactionType: z.string(),
+        commentId: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.db.comment.findUnique({
+        where: { id: input.commentId },
+      })
+      const res = await ctx.db.commentReaction.create({
+        data: {
+          reactionType: input.reactionType,
+          commentId: input.commentId,
+          userId: ctx.session!.user.id,
+        },
+      })
+      return res
+    }),
+  deleteCommentReaction: protectedProcedure
+    .input(
+      z.object({
+        reactionType: z.string(),
+        commentId: z.number(),
+        id: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const res = await ctx.db.commentReaction.findUnique({
+        where: {
+          userId_commentId_reactionType: {
+            commentId: input.commentId,
+            userId: ctx.session!.user.id,
+            reactionType: input.reactionType,
+          },
+        },
+      })
+      if (res?.userId !== ctx.session?.user.id) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'You do not have permission to delete this comment',
+        })
+      }
+
+      return await ctx.db.commentReaction.delete({
+        where: {
+          id: input.id,
+        },
+      })
+    }),
+
+  /* const getReactions = async (): Promise<Reaction[]> => {
+  const query = supabase
+    .from<Reaction>('sce_reactions')
+    .select('*')
+    .order('type', { ascending: true });
+
+  const response = await query;
+  assertResponseOk(response);
+  return response.data as Reaction[];
+};
+ */
+  /* const getReaction = async (type: string): Promise<Reaction> => {
+  const query = supabase
+    .from<Reaction>('sce_reactions')
+    .select('*')
+    .eq('type', type)
+    .single();
+
+  const response = await query;
+  assertResponseOk(response);
+  return response.data as Reaction;
+}; */
 })

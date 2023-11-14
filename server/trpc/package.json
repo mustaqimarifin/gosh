@@ -1,11 +1,11 @@
 {
   "name": "trpc-api",
-  "typings": "action_client.ts",
+  "typings": "client.ts",
   "exports": {
     ".": {
-      "types": "./action_client.ts",
-      "react-server": "./app_client.ts",
-      "default": "./action_client.ts"
+      "types": "./client.ts",
+      "react-server": "./server-http.ts",
+      "default": "./client.ts"
     }
   }
 }

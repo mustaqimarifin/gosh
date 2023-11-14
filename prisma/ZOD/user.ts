@@ -1,5 +1,6 @@
 import * as z from "zod"
-import { CompleteAccount, relatedAccountSchema, CompleteComment, relatedCommentSchema, CompleteLike, relatedLikeSchema, CompleteSession, relatedSessionSchema, CompleteHotline, relatedHotlineSchema } from "./index"
+import { Level } from "@prisma/client"
+import { CompleteAccount, relatedAccountSchema, CompleteComment, relatedCommentSchema, CompleteCommentReaction, relatedCommentReactionSchema, CompleteHotline, relatedHotlineSchema, CompleteLike, relatedLikeSchema, CompleteSession, relatedSessionSchema } from "./index"
 
 export const userSchema = z.object({
   id: z.string(),
@@ -7,14 +8,16 @@ export const userSchema = z.object({
   email: z.string().nullish(),
   emailVerified: z.date().nullish(),
   image: z.string().nullish(),
+  level: z.nativeEnum(Level).nullish(),
 })
 
 export interface CompleteUser extends z.infer<typeof userSchema> {
   accounts: CompleteAccount[]
   comments: CompleteComment[]
+  reactions: CompleteCommentReaction[]
+  hotlines: CompleteHotline[]
   likes: CompleteLike[]
   sessions: CompleteSession[]
-  hotlines: CompleteHotline[]
 }
 
 /**
@@ -25,7 +28,8 @@ export interface CompleteUser extends z.infer<typeof userSchema> {
 export const relatedUserSchema: z.ZodSchema<CompleteUser> = z.lazy(() => userSchema.extend({
   accounts: relatedAccountSchema.array(),
   comments: relatedCommentSchema.array(),
+  reactions: relatedCommentReactionSchema.array(),
+  hotlines: relatedHotlineSchema.array(),
   likes: relatedLikeSchema.array(),
   sessions: relatedSessionSchema.array(),
-  hotlines: relatedHotlineSchema.array(),
 }))

@@ -3,7 +3,7 @@ import { CompleteComment, relatedCommentSchema, CompleteUser, relatedUserSchema 
 
 export const likeSchema = z.object({
   userId: z.string(),
-  commentId: z.string(),
+  commentId: z.number().int(),
 })
 
 export interface CompleteLike extends z.infer<typeof likeSchema> {

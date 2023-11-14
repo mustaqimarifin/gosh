@@ -1,69 +1,49 @@
-//@ts-nocheck
-import Image from "next/legacy/image"
-import Link from "next/link"
-import { useMDXComponent } from "next-contentlayer/hooks"
-import * as React from "react"
-import { Tweet } from "react-tweet"
+import NextImage from "next/legacy/image";
+import Link from "next/link";
+import { useMDXComponent } from "next-contentlayer/hooks";
+import * as React from "react";
 
-//import Tweet from './tweet'
-//import { allPosts } from 'contentlayer/generated';
+import { StaticTweet } from "./tweet";
 
 const CustomLink = (props) => {
-  const href = props.href
+  const href = props.href;
 
   if (href.startsWith("/")) {
     return (
       <Link href={href} {...props}>
         {props.children}
       </Link>
-    )
+    );
   }
 
   if (href.startsWith("#")) {
-    return <a {...props} />
+    return <a {...props} />;
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />
+  return <a target="_blank" rel="noopener noreferrer" {...props} />;
+};
+
+function Image(props) {
+  return <NextImage {...props} />;
 }
 
-const Paragraph = (props) => {
-  if (typeof props.children !== "string") {
-    return <>{props.children}</>
-  }
-  if (props.children.type === "img") {
-    return <RoundedImage {...props}>{props.children}</RoundedImage>
-  }
-  return <p {...props} />
-}
-
-function RoundedImage(props) {
-  return <Image alt={""} className="rounded-lg" placeholder="blur" {...props} />
-}
-
-const MeatTweet = ({ id }) => {
-  return (
-    <div className="my-6 flex w-full content-center p-6">
-      <Tweet id={id} />
-    </div>
-  )
-}
 function Callout(props) {
   return (
-    <div className="my-8 flex rounded-lg border border-neutral-200 bg-neutral-100 p-4 dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="mr-4 flex w-4 items-center">{props.emoji}</div>
-      <div className="callout w-full">{props.children}</div>
+    <div className="px-4 py-3 border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 rounded p-1 text-sm flex items-center text-neutral-900 dark:text-neutral-100 mb-8">
+      <div className="flex items-center w-4 mr-4">{props.emoji}</div>
+      <div className="w-full callout">{props.children}</div>
     </div>
-  )
+  );
 }
 
 function ProsCard({ title, pros }) {
   return (
-    <div className="my-4 w-full rounded-xl border border-emerald-200 bg-neutral-50 p-6 dark:border-emerald-900 dark:bg-neutral-900">
+    <div className="border border-emerald-200 dark:border-emerald-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-4 w-full">
       <span>{`You might use ${title} if...`}</span>
       <div className="mt-4">
         {pros.map((pro) => (
-          <div key={pro} className="mb-2 flex items-baseline font-medium">
-            <div className="mr-2 h-4 w-4">
+          <div key={pro} className="flex font-medium items-baseline mb-2">
+            <div className="h-4 w-4 mr-2">
               <svg className="h-4 w-4 text-emerald-500" viewBox="0 0 24 24">
                 <g
                   fill="none"
@@ -82,17 +62,17 @@ function ProsCard({ title, pros }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function ConsCard({ title, cons }) {
   return (
-    <div className="my-6 w-full rounded-xl border border-red-200 bg-neutral-50 p-6 dark:border-red-900 dark:bg-neutral-900">
+    <div className="border border-red-200 dark:border-red-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-6 w-full">
       <span>{`You might not use ${title} if...`}</span>
       <div className="mt-4">
         {cons.map((con) => (
-          <div key={con} className="mb-2 flex items-baseline font-medium">
-            <div className="mr-2 h-4 w-4">
+          <div key={con} className="flex font-medium items-baseline mb-2">
+            <div className="h-4 w-4 mr-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -107,31 +87,24 @@ function ConsCard({ title, cons }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-const Components = {
+const components = () => ({
+  img: Image,
   a: CustomLink,
-  //p: Paragraph,
-  img: RoundedImage,
   Callout,
   ProsCard,
   ConsCard,
-  MeatTweet,
-}
+  StaticTweet,
+});
 
-//const PC = React.cache(Components)
+export function Mdx({ code }: { code: string }) {
+  const Component = useMDXComponent(code);
 
-interface MdxProps {
-  code: string
-  components?: Record<string, any>
-  meta?: string[]
-  tweets?: Record<string, any>
-  [key: string]: unknown
-}
-
-export const MDX = ({ code }: MdxProps) => {
-  const Component = useMDXComponent(code)
-
-  return <Component components={{ ...Components }} />
+  return (
+    <article className="prose prose-quoteless prose- dark:prose-invert">
+      <Component components={components()} />
+    </article>
+  );
 }

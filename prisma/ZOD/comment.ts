@@ -1,13 +1,13 @@
 import * as z from "zod"
-import { CompletePost, relatedPostSchema, CompleteUser, relatedUserSchema, CompleteLike, relatedLikeSchema } from "./index"
+import { CompletePost, relatedPostSchema, CompleteUser, relatedUserSchema, CompleteCommentReaction, relatedCommentReactionSchema, CompleteLike, relatedLikeSchema } from "./index"
 
 export const commentSchema = z.object({
-  id: z.string(),
+  id: z.number().int(),
   text: z.string().max(10000),
   createdAt: z.date(),
   updatedAt: z.date().nullish(),
   userId: z.string().nullish(),
-  parentId: z.string().nullish(),
+  parentId: z.number().int().nullish(),
   slug: z.string().nullish(),
 })
 
@@ -16,6 +16,7 @@ export interface CompleteComment extends z.infer<typeof commentSchema> {
   replies: CompleteComment[]
   post?: CompletePost | null
   user?: CompleteUser | null
+  reactions: CompleteCommentReaction[]
   likes: CompleteLike[]
 }
 
@@ -29,5 +30,6 @@ export const relatedCommentSchema: z.ZodSchema<CompleteComment> = z.lazy(() => c
   replies: relatedCommentSchema.array(),
   post: relatedPostSchema.nullish(),
   user: relatedUserSchema.nullish(),
+  reactions: relatedCommentReactionSchema.array(),
   likes: relatedLikeSchema.array(),
 }))

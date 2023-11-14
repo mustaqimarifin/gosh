@@ -1,20 +1,19 @@
-import { type NextRequest,NextResponse } from "next/server"
-////import { PostSchema } from 'prisma/ZOD'
-import { prisma } from "server/db/prisma"
+import { type NextRequest, NextResponse } from "next/server";
+import { prisma } from "server/db/prisma";
 
 //mport { z } from 'zod'
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 //type upView = z.infer<typeof PostSchema>
 
 export async function POST(req: NextRequest) {
-  let slug
+  let slug;
   try {
-    const { searchParams } = new URL(req.url)
-    slug = searchParams.get("slug")
+    const { searchParams } = new URL(req.url);
+    slug = searchParams.get("slug");
     if (!slug) {
-      const url = new URL(req.url)
-      slug = url.pathname.substring(url.pathname.lastIndexOf("/") + 1)
+      const url = new URL(req.url);
+      slug = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
     }
 
     const total = await prisma.post.upsert({
@@ -29,26 +28,26 @@ export async function POST(req: NextRequest) {
           increment: 1,
         },
       },
-    })
+    });
     return NextResponse.json({
       total: total.count?.toString(),
-    })
+    });
   } catch (e) {
-    console.log(`${e}`)
+    console.log(`${e}`);
     return new Response(`Failed to increment page`, {
       status: 500,
-    })
+    });
   }
 }
 
 export async function GET(req: Request) {
-  let slug
+  let slug;
   try {
-    const { searchParams } = new URL(req.url)
-    slug = searchParams.get("slug")
+    const { searchParams } = new URL(req.url);
+    slug = searchParams.get("slug");
     if (!slug) {
-      const url = new URL(req.url)
-      slug = url.pathname.substring(url.pathname.lastIndexOf("/") + 1)
+      const url = new URL(req.url);
+      slug = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
     }
 
     const data = await prisma.post.findMany({
@@ -58,18 +57,18 @@ export async function GET(req: Request) {
       select: {
         count: true,
       },
-    })
+    });
 
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     //const total = data?.reduce((acc, row) => acc + row.count, 0)
 
     return NextResponse.json({
       total: Number(data[0].count),
-    })
+    });
   } catch (e) {
-    console.log(`${e}`)
+    console.log(`${e}`);
     return new Response(`Failed to increment page`, {
       status: 500,
-    })
+    });
   }
 }

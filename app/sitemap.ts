@@ -1,17 +1,17 @@
-import { allPosts } from "contentlayer/generated"
+import { allPosts } from "contentlayer/generated";
 
 export default async function sitemap() {
   const blogs = allPosts.map((post) => ({
-    url: `https://leerob.io/post/${post.slug}`,
+    url: `http://localhost:3000/blog/${post.slug}`,
     lastModified: post.date,
-  }))
+  }));
 
-  const routes = ["", "/about", "/post", "/scribbles", "/hotline", "/uses"].map(
+  const routes = ["", "/blog", "/guestbook", "/hotline", "/uses"].map(
     (route) => ({
-      url: `https://leerob.io${route}`,
+      url: `http://localhost:3000${route}`,
       lastModified: new Date().toISOString().split("T")[0],
-    })
-  )
+    }),
+  );
 
-  return [...routes, ...blogs]
+  return [...routes, ...blogs];
 }

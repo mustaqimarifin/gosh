@@ -1,85 +1,100 @@
-import "./Comment.modules.css"
+//import "./Comment.modules.css";
 
-import { Button } from "components/Buttons"
-import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
-import { usePost } from "hooks/usePost"
-import { cx } from "lib/utils"
+import { Button } from "components/Buttons";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { usePost } from "hooks/usePost";
+import { cx } from "lib/utils";
 import {
   Heart,
   HeartOff,
   Pencil,
   Reply as ReplyIcon,
   Trash,
-} from "lucide-react"
-import { useSession } from "next-auth/react"
-import { useState } from "react"
-import { api } from "server/trpc/query_client"
-import type { Comment } from "types"
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { api } from "server/trpc/query-client";
+import type { Comment } from "types/index";
 
-import Avatar from "./Avatar"
-import { CommentForm } from "./Form"
-import { CommentList } from "./List"
+import Avatar from "./Avatar";
+import { CommentForm } from "./Form";
+import { CommentList } from "./List";
 
 dayjs.extend(relativeTime, {
   rounding: Math.floor,
-})
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.tz.setDefault(dayjs.tz.guess())
+});
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault(dayjs.tz.guess());
 const dateFormatter = new Intl.DateTimeFormat("en", {
   dateStyle: "medium",
   timeStyle: "short",
-})
-interface CommentProps {
-  comment: Comment
-  parentId?: string
-  replies?: Comment[]
+});
+export interface CommentProps {
+  comment: Comment;
+  parentId?: string;
+  replies?: Comment[];
 }
 
 export const CommentSolo = ({ comment }: CommentProps) => {
-  const { parentId, id, text, user,updatedAt,createdAt, likeCount, likedByMe, slug } =
-    comment
-  const replyId = parentId ? parentId : id
-  const { data: session } = useSession()
-  const { getReplies } = usePost(slug)
+  const {
+    parentId,
+    id,
+    text,
+    user,
+    updatedAt,
+    createdAt,
+    likeCount,
+    likedByMe,
+    slug,
+  } = comment;
+  const authorId = comment.user.id;
+  const replyId = parentId ? parentId : id;
+  const { data: session } = useSession();
+  const { getReplies } = usePost(slug);
 
-  const utils = api.useContext()
+  const utils = api.useUtils();
   const invalidate = (input: any) => {
-    utils.getBySlug.invalidate(input)
-  }
+    utils.getBySlug.invalidate(input);
+  };
   const createComment = api.addComment.useMutation({
-    onSuccess(input) {
-      invalidate(input)
+    async onSuccess(input) {
+      invalidate(input);
     },
-  })
+  });
 
   const updateComment = api.updateComment.useMutation({
-    onSuccess(input) {
-      invalidate(input)
+    async onSuccess(input) {
+      invalidate(input);
     },
-  })
+  });
   const deleteComment = api.deleteComment.useMutation({
-    onSuccess(input) {
-      invalidate(input)
+    async onSuccess(input) {
+      invalidate(input);
     },
-  })
+  });
 
   const toggleCommentLike = api.toggleLike.useMutation({
-    onSuccess(input) {
-      invalidate(input)
+    async onSuccess(input) {
+      invalidate(input);
     },
-  })
+  });
 
-  const [isReplying, setIsReplying] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [areChildrenHidden, setAreChildrenHidden] = useState(false)
+  const canReply = Boolean(user.id);
+  const [showReplyForm, setShowReplyForm] = useState(false);
 
-  console.time()
-  const replies = getReplies(id)
-  console.timeEnd()
+  const canDelete =
+    authorId === comment?.user.id && comment.replies?.length === 0;
+  const [isReplying, setIsReplying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hidden, setHidden] = useState(false);
+
+  console.time();
+  const replies = getReplies(id);
+  console.timeEnd();
 
   const handleReply = async (text: string) => {
     return await createComment
@@ -89,36 +104,65 @@ export const CommentSolo = ({ comment }: CommentProps) => {
         slug,
       })
       .then(() => {
-        setIsReplying(false)
-      })
-  }
+        setIsReplying(false);
+      });
+  };
 
   const handleCommentEdit = async (text: string) => {
     return await updateComment
       .mutateAsync({
         commentId: id,
-        text, updatedAt
+        text,
+        updatedAt,
         //slug,
       })
       .then(() => {
-        setIsEditing(false)
-      })
-  }
+        setIsEditing(false);
+      });
+  };
 
   const handleCommentDelete = async () => {
     return await deleteComment.mutateAsync({
       commentId: id,
       //slug,
-    })
-  }
+    });
+  };
 
   const handleToggleCommentLike = async () => {
-    if (!session) return
+    if (!session) return;
     return await toggleCommentLike.mutateAsync({
       commentId: id,
       // slug,
-    })
-  }
+    });
+  };
+  const ReplyForm = ({
+    placeholder,
+    submitLabel,
+    comment,
+    handleResetCallback,
+  }) => {
+    const [hidden, setHidden] = useState(false);
+    return (
+      <div
+        className={cx(
+          "my-1 transition duration-1000 ease-in-out transform -translate-x-1 -mr-1",
+          {
+            hidden,
+          },
+        )}
+      >
+        <CommentForm
+          //parentId={comment.id}
+          autoFocus={true}
+          handleResetCallback={handleResetCallback}
+          submitLabel={submitLabel}
+          placeholder={placeholder}
+          onSubmit={handleReply}
+          hideEarlyCallback={() => setHidden(true)}
+        />
+      </div>
+    );
+  };
 
   return (
     <div className="border ">
@@ -131,8 +175,15 @@ export const CommentSolo = ({ comment }: CommentProps) => {
             <Avatar src={user?.image} isLoading={false} className="mr-3" />
             <div>{user?.name}</div>
           </div>
-          <div className="justify-end">{createdAt.getTime()}</div>
-          {user.level !== "NONE" ? (
+          <span
+            className=" font-semibold text-xs ml-auto text-pink-400 dark:text-pink-100 justify-self-auto "
+            suppressHydrationWarning
+          >
+            {dayjs().diff(createdAt, "seconds", true) < 30
+              ? "just now"
+              : dayjs(createdAt).fromNow()}
+          </span>
+          {user.level ? (
             <div className="hidden text-xs leading-[18px] sm:inline-flex">
               <span className="color-box-border-info ml-1 rounded-xl border px-[7px] font-medium capitalize">
                 {user.level}
@@ -151,14 +202,6 @@ export const CommentSolo = ({ comment }: CommentProps) => {
           <div className="text">{text}</div>
         )}
         <div className="mt-2 flex gap-2">
-          <Button
-            onClick={handleToggleCommentLike}
-            Icon={likedByMe ? Heart : HeartOff}
-            aria-label={likedByMe ? "Unlike" : "Like"}
-            color="text-purple-700"
-          >
-            {likeCount}
-          </Button>
           {session && (
             <Button
               onClick={() => setIsReplying((prev) => !prev)}
@@ -188,11 +231,79 @@ export const CommentSolo = ({ comment }: CommentProps) => {
           )}
         </div>
       </div>
-      {isReplying && (
+      {canReply && (
+        <div className="grid grid-flow-col justify-start auto-cols-min gap-x-3 transform">
+          <Button
+            onClick={handleToggleCommentLike}
+            Icon={likedByMe ? Heart : HeartOff}
+            aria-label={likedByMe ? "Unlike" : "Like"}
+            color="text-purple-700"
+          >
+            {likeCount}
+          </Button>
+
+          <span
+            className="text-xs flex items-center text-gray-600 dark:text-gray-100 border-none"
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            aria-label={
+              showReplyForm
+                ? `Hide reply form`
+                : `Reply to comment by ${comment.user}`
+            }
+          >
+            {showReplyForm ? (
+              <button className="text-gray-500 dark:text-gray-200 hover:text-red-300">
+                Cancel&nbsp;&nbsp;
+              </button>
+            ) : (
+              <button className="text-gray-500 dark:text-gray-200 hover:text-indigo-300">
+                Reply&nbsp;&nbsp;
+              </button>
+            )}
+
+            {canDelete && (
+              <button
+                className="text-xs flex flex-row items-center text-gray-500 dark:text-gray-200 hover:text-yellow-300 border-none"
+                onClick={handleCommentDelete}
+                aria-label={`Delete comment by ${comment.user.name}`}
+              >
+                &nbsp;Delete
+              </button>
+            )}
+          </span>
+        </div>
+      )}
+      {/*       {isReplying && (
         <div className="ml-3 mt-1">
           <CommentForm autoFocus submitLabel="Reply" onSubmit={handleReply} />
         </div>
-      )}
+      )} */}
+
+      <div
+        className={cx(
+          "row-start-3 row-span-2 rounded-md transform -translate-x-2 -mr-2",
+          {
+            hidden,
+          },
+        )}
+      >
+        {showReplyForm && (
+          <div className="divide-pink-200 ">
+            {/*  <CommentForm
+              autoFocus
+              submitLabel="Reply"
+              onSubmit={handleReply}
+              handleResetCallback={() => setShowReplyForm(false)}
+            /> */}
+            <ReplyForm
+              comment={comment}
+              submitLabel="Reply"
+              placeholder={`Reply to comment by ${comment.user.name}`}
+              handleResetCallback={() => setShowReplyForm(false)}
+            />
+          </div>
+        )}
+      </div>
       {/*  {replies?.length > 0 && (
         <>
           <div className={cx("flex", areChildrenHidden && "hidden")}>
@@ -219,7 +330,7 @@ export const CommentSolo = ({ comment }: CommentProps) => {
       {replies &&
         replies.sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         ) &&
         replies?.length > 0 && (
           <div className="pl-4">
@@ -244,5 +355,5 @@ export const CommentSolo = ({ comment }: CommentProps) => {
           </div>
         )}
     </div>
-  )
-}
+  );
+};

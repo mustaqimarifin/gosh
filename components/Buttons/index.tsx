@@ -1,19 +1,19 @@
-import { cx } from "lib/utils"
-import { type LucideIcon } from "lucide-react"
-import { useSession } from "next-auth/react"
+import { cx } from "lib/utils";
+import { type LucideIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export interface IconButtonProps {
-  Icon: LucideIcon
-  children?: React.ReactNode
-  color: string
-  hoverbg?: string
-  isActive?: boolean
-  onClick: () => void
+  Icon: LucideIcon;
+  children?: React.ReactNode;
+  color: string;
+  hoverbg?: string;
+  isActive?: boolean;
+  onClick: () => void;
 }
 
 export const Button = (props: IconButtonProps) => {
-  const { Icon, isActive, color, children, hoverbg } = props
-  const { data: session } = useSession()
+  const { Icon, isActive, color, children, hoverbg } = props;
+  const { data: session } = useSession();
 
   return (
     <button
@@ -22,7 +22,7 @@ export const Button = (props: IconButtonProps) => {
         color,
         hoverbg,
         isActive && "bg-slate-200",
-        session ? "cursor-pointer hover:bg-purple-50" : "cursor-default"
+        session ? "cursor-pointer hover:bg-purple-50" : "cursor-default",
       )}
       {...props}
     >
@@ -31,10 +31,10 @@ export const Button = (props: IconButtonProps) => {
           "h-4 w-4",
           !isActive && color,
           isActive && "text-black",
-          children?.toString() && "mr-1"
+          children?.toString() && "mr-1",
         )}
       />
       <span className="text-sm">{children}</span>
     </button>
-  )
-}
+  );
+};

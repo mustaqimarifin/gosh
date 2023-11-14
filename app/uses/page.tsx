@@ -1,18 +1,17 @@
-import type { Metadata } from "next"
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Uses",
   description:
     "Here's what tech I'm currently using for coding, videos, and music.",
-}
+};
 
 export default function UsesPage() {
   return (
     <section>
-      <h1 className="mb-8 font-serif text-3xl font-bold">Uses</h1>
-      <p className="mb-8 mt-2 text-neutral-700 dark:text-neutral-300">
-        Here's what tech I'm currently using for coding, videos, and music.
-      </p>
+      <h1 className="font-semibold text-2xl mb-8 tracking-tighter">
+        here's my setup
+      </h1>
       <div className="prose prose-neutral dark:prose-invert">
         <h3 id="computer-office">Computer / Office</h3>
         <ul>
@@ -77,5 +76,5 @@ export default function UsesPage() {
         </ul>
       </div>
     </section>
-  )
+  );
 }

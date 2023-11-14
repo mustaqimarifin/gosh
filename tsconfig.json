@@ -1,41 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "ES2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
-    "paths": {
-      "contentlayer/generated": ["./.contentlayer/generated"]
-    },
+    "paths": { "contentlayer/generated": ["./.contentlayer/generated"] },
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "plugins": [ {"name": "next"} ],
     "strictNullChecks": true
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
+    "next-env.d.ts"          ,
+    "**/*.ts"                ,
+    "**/*.tsx"               ,
+    ".next/types/**/*.ts"    ,
     ".contentlayer/generated",
-    "contentlayer.config.ts",
-    "prettier.config.mjs",
-    "next.config.mjs",
-    "string.tsx",
-    ".eslintrc.cjs"
+    "prisma/seed.cjs"        ,
+    "lib/Meta2.ts"
   ],
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "exclude": ["node_modules"]
 }

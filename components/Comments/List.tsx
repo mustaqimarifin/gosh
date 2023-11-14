@@ -1,22 +1,24 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react"
-import type { Comment } from "types"
+"use client"
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import type { Comment } from "types";
 
-import { CommentSolo } from "./Single"
+//import { CommentSolo } from "./Single";
+import { CommentSolo2 } from "./Single2";
 
 interface CommentListProps {
-  comments: Comment[]
+  comments: Comment[];
 }
 
 export const CommentList = ({ comments }: CommentListProps) => {
-  const [parent] = useAutoAnimate<HTMLDivElement>()
+  const [parent] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <div ref={parent}>
       {comments?.map((comment) => (
-        <div key={comment.id} className="my-1 last:mb-0">
-          <CommentSolo comment={comment} />
+        <div key={comment.id}>
+          <CommentSolo2 comment={comment} />
         </div>
       ))}
     </div>
-  )
-}
+  );
+};

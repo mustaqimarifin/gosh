@@ -1,26 +1,23 @@
-//import { transformer } from "app/providers"
-import { experimental_createServerActionHandler } from "@trpc/next/app-dir/server"
-import { initTRPC, TRPCError } from "@trpc/server"
-import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
-import { headers } from "next/headers"
-import { prisma } from "server/db/prisma"
-import SuperJSON from "SuperJSON"
-import { ZodError } from "zod"
+import { experimental_createServerActionHandler } from "@trpc/next/app-dir/server";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { headers } from "next/headers";
+import { prisma as db } from "server/db/prisma";
+import SuperJSON from "superjson";
+import { ZodError } from "zod";
 
-import { auth } from "./db/auth"
-
-
+import { auth } from "./db/auth";
 
 export async function createContext(opts?: FetchCreateContextFnOptions) {
-  const session = await auth()
+  const session = await auth();
   return {
     session,
-    prisma,
+    db,
     headers: opts && Object.fromEntries(opts.req.headers),
-  }
+  };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>>
+export type Context = Awaited<ReturnType<typeof createContext>>;
 
 /**
  * 2. INITIALIZATION
@@ -33,7 +30,7 @@ export type Context = Awaited<ReturnType<typeof createContext>>
 const t = initTRPC.context<Context>().create({
   transformer: SuperJSON,
   errorFormatter(opts) {
-    const { shape, error } = opts
+    const { shape, error } = opts;
     return {
       ...shape,
       data: {
@@ -43,9 +40,9 @@ const t = initTRPC.context<Context>().create({
             ? error.cause.flatten()
             : null,
       },
-    }
+    };
   },
-})
+});
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -59,8 +56,8 @@ const t = initTRPC.context<Context>().create({
  *
  * @see https://trpc.io/docs/router
  */
-export const router = t.router
-export const mergeRouters = t.mergeRouters
+export const router = t.router;
+export const mergeRouters = t.mergeRouters;
 
 /**
  * Public (unauthenticated) procedure
@@ -69,18 +66,18 @@ export const mergeRouters = t.mergeRouters
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure
+export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
 
 const enforceAuth = t.middleware(({ ctx, next }) => {
   if (!ctx.session) {
-    throw new TRPCError({ code: "UNAUTHORIZED" })
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx,
-  })
-})
+  });
+});
 
 /**
  * Protected (authenticated) procedure
@@ -90,19 +87,19 @@ const enforceAuth = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure.use(enforceAuth)
+export const protectedProcedure = t.procedure.use(enforceAuth);
 
 export const createAction = experimental_createServerActionHandler(t, {
   async createContext() {
-  const session = await auth()
+    const session = await auth();
 
     return {
       session,
-      prisma,
+      db,
       headers: {
         // Pass the cookie header to the API
         cookies: headers().get("cookie") ?? "",
       },
-    }
+    };
   },
-})
+});

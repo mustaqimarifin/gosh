@@ -1,35 +1,34 @@
-"use client"
+"use client";
 
-import { CompleteComment } from "prisma/ZOD"
-import { useMemo } from "react"
-import { api } from "server/trpc/query_client"
-import type { Comment } from "types/index"
+import { useMemo } from "react";
+import { api } from "server/trpc/query-client";
+import type { Comment } from "types/index";
 
 export interface PostProps {
-  slug: string
+  slug: string;
 }
 
 export const usePost = (slug: string) => {
-  const { data: post } = api.getBySlug.useQuery({ slug })
+  const { data: post } = api.getBySlug.useQuery({ slug });
 
   const commentsByParentId = useMemo(() => {
-    const group: { [key: string]: Comment[] } = {}
+    const group: { [key: string]: Comment[] } = {};
     post?.comments?.forEach((c) => {
-      group[c.parentId!] ||= []
+      group[c.parentId!] ||= [];
       //@ts-ignore
-      group[c.parentId!].push(c)
-    })
+      group[c.parentId!].push(c);
+    });
 
-    return group
-  }, [post?.comments])
+    return group;
+  }, [post?.comments]);
 
-  const getReplies = (parentId: string): Comment[] => {
-    return commentsByParentId?.[parentId] || []
-  }
+  const getReplies = (parentId: number): Comment[] => {
+    return commentsByParentId?.[parentId] || [];
+  };
 
   return {
     post,
     rootComments: commentsByParentId["null"] || [],
     getReplies,
-  }
-}
+  };
+};
